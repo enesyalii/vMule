@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Releases · vMule Admin{% endblock %}
+{% block body %}
+<div class="row" style="margin-bottom:16px">
+  <a class="btn" href="{{ url_for('new_update') }}">Publish new update</a>
+</div>
+<div class="card">
+  <table>
+    <tr>
+      <th>Version</th><th>Title</th><th>Channel</th><th>Status</th><th></th>
+    </tr>
+    {% for u in updates %}
+    <tr>
+      <td><b>{{ u.version }}</b><div class="muted">{{ u.filename }}</div></td>
+      <td>{{ u.title }}<div class="muted">{{ u.changelog[:140] }}{% if u.changelog|length > 140 %}…{% endif %}</div></td>
+      <td>{{ u.channel }}</td>
+      <td><span class="pill {% if u.published %}on{% endif %}">{{ "published" if u.published else "draft" }}</span></td>
+      <td>
+        <div class="row">
+          <a class="btn ghost" href="{{ url_for('edit_update', item_id=u.id) }}">Edit</a>
+          <form method="post" action="{{ url_for('publish', item_id=u.id) }}">
+            <input type="hidden" name="published" value="{{ '0' if u.published else '1' }}">
+            <button class="btn {% if u.published %}ghost{% else %}ok{% endif %}" type="submit">
+              {{ "Unpublish" if u.published else "Publish" }}
+            </button>
+          </form>
+          <form method="post" action="{{ url_for('delete_update', item_id=u.id) }}" onsubmit="return confirm('Delete this update?');">
+            <button class="btn bad" type="submit">Delete</button>
+          </form>
+        </div>
+      </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="5">No updates yet.</td></tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

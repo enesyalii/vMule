@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>vMule-Project.net - Help &amp; Support</title>
+  <link rel="stylesheet" href="/website/css/site.css">
+  <link rel="icon" href="/website/img/logo.svg">
+</head>
+<body>
+<script src="/website/js/chrome.js"></script>
+<script>
+document.write(vmuleChrome(`
+  <h2>Help &amp; Support</h2>
+  <h3>Getting started</h3>
+  <p>1. Open the <a href="/client/">vMule client</a>. 2. Press Connect. You want a High ID (open TCP 4662 and UDP 4672). 3. Wait until Kad is connected. 4. Search, then right-click Download. 5. Share a folder of files you are allowed to distribute so your credit score grows.</p>
+  <h3>Low ID</h3>
+  <p>A Low ID means the server cannot connect back to you. Uploads still work, but source exchange is weaker. Forward ports, or buy a <a href="shop.html">High-ID node</a> from the shop.</p>
+  <h3>Web interface</h3>
+  <p>The control panel is the aMule-style remote UI. Set <code>PANEL_PASSWORD</code> in your local <code>.env</code> (never commit that file). Enable the webinterface in Preferences.</p>
+  <h3>Legal</h3>
+  <p>vMule is a tool. You are responsible for what you share. Only search and transfer files you have the right to distribute (your own work, public domain, Creative Commons, open-source ISOs, and so on).</p>
+  <h3>FAQ</h3>
+  <table class="std">
+    <tr><th>Question</th><th>Answer</th></tr>
+    <tr><td>Where is server.met?</td><td>The client ships with official vMule servers. Add more from Servers → Add, or purchase a dedicated server.</td></tr>
+    <tr><td>What is Kad?</td><td>Kademlia is the decentralized network. It works even if ED2K servers are down.</td></tr>
+    <tr><td>Credit system?</td><td>Uploading earns credits so you move up in other people's queues.</td></tr>
+    <tr><td>How do I publish a new version?</td><td>Run the separate Python admin on port 5050.</td></tr>
+  </table>
+`));
+vmuleReady();
+</script>
+</body>
+</html>

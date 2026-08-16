@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>vMule-Project.net - Download</title>
+  <link rel="stylesheet" href="/website/css/site.css">
+  <link rel="icon" href="/website/img/logo.svg">
+</head>
+<body>
+<script src="/website/js/chrome.js"></script>
+<script>
+document.write(vmuleChrome(`
+  <h2>Download</h2>
+  <p>The official version is the latest stable Windows build. The NSIS installer is attached to GitHub Releases. Choose the stable channel if you want a well tested version.</p>
+  <div class="notice"><a class="btn gold" href="https://github.com/enesyalii/vMule/releases/latest">Download vMule Setup (NSIS)</a> &nbsp; Or run the <a href="/client/">web client</a> in the browser.</div>
+  <table class="dltable" id="dls">
+    <tr><th>Package</th><th>Channel</th><th>Size</th><th></th></tr>
+  </table>
+  <h3>Extras and additional tools</h3>
+  <table class="std">
+    <tr><th>Help files</th></tr>
+    <tr><td>Helpfiles contain a lot of useful information, explanation, FAQ and guides. Download the helpfile of your choice into the vMule installation folder! Then press F1 within vMule to start the help! English · German · French · Spanish · Chinese traditional · Italian · Portuguese (Brazil)</td></tr>
+  </table>
+`));
+vmuleReady();
+fetch("/api/updates").then(r => r.json()).then(list => {
+  const t = document.getElementById("dls");
+  list.forEach(u => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td><b>${u.title}</b><br><span class="muted">${u.filename}<br>${u.changelog}</span></td>
+      <td>${u.channel}<br><b>${u.version}</b></td>
+      <td>${u.size || "—"}</td>
+      <td><a class="btn" href="${u.download_url}">Download</a></td>`;
+    t.appendChild(tr);
+  });
+});
+</script>
+</body>
+</html>

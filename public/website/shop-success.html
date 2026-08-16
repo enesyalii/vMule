@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>vMule-Project.net - Payment successful</title>
+  <link rel="stylesheet" href="/website/css/site.css">
+  <link rel="icon" href="/website/img/logo.svg">
+</head>
+<body>
+<script src="/website/js/chrome.js"></script>
+<script>
+document.write(vmuleChrome(`
+  <h2>Thank you</h2>
+  <p>Your vMule server purchase completed. The node is now in the client server list.</p>
+  <p id="detail" class="muted">Loading session...</p>
+  <p><a class="btn" href="/client/">Open client</a> <a class="btn" href="/panel/">Open control panel</a> <a class="btn" href="shop.html">Back to shop</a></p>
+`));
+vmuleReady();
+const params = new URLSearchParams(location.search);
+const id = params.get("session_id");
+if (id) {
+  fetch("/api/checkout/session/" + encodeURIComponent(id)).then(r => r.json()).then(s => {
+    document.getElementById("detail").textContent =
+      (s.planName || s.planId || "Server") + " · " + (s.status || "paid") + (s.demo ? " · demo checkout" : "");
+  }).catch(() => {
+    document.getElementById("detail").textContent = "Session " + id;
+  });
+}
+</script>
+</body>
+</html>

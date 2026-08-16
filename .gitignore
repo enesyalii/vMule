@@ -1,0 +1,14 @@
+node_modules/
+.env
+__pycache__/
+*.pyc
+.venv/
+venv/
+data/purchases.json
+*.log
+.DS_Store
+dist/
+.vercel
+release/
+*.exe
+!build/**

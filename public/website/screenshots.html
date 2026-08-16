@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>vMule-Project.net - Screenshots</title>
+  <link rel="stylesheet" href="/website/css/site.css">
+  <link rel="icon" href="/website/img/logo.svg">
+</head>
+<body>
+<script src="/website/js/chrome.js"></script>
+<script>
+document.write(vmuleChrome(`
+  <h2>Screenshots</h2>
+  <p>vMule keeps the classic multi-window client: servers, search, transfer, shared files, statistics, messages, IRC and Kad. The remote panel follows the aMule web interface so you can control a running client from a browser.</p>
+  <div class="shots">
+    <div class="shot">
+      <div style="background:#0a246a;color:#fff;padding:2px 6px">vMule - Transfer</div>
+      <div style="background:#d4d0c8;padding:6px">Downloads · ubuntu-24.04.2-desktop-amd64.iso 42%<br>Sintel-2010-1080p-CC-BY.mkv 91%</div>
+      <div style="margin-top:8px;color:#9ad">▲ 18.2 KB/s &nbsp; ▼ 312 KB/s &nbsp; ED2K High ID &nbsp; Kad: connected</div>
+    </div>
+    <div class="shot">
+      <div style="background:#0a246a;color:#fff;padding:2px 6px">vMule - Servers</div>
+      <div>vMule Razorback &nbsp; 176.12.44.18:4661 &nbsp; 182440 users<br>DonkeyServer No1 &nbsp; 91.204.44.112:4242</div>
+    </div>
+    <div class="shot">
+      <div style="background:#222;color:#f39c12;padding:2px 6px">vMuleWeb · Transfers</div>
+      <div>Pause / Resume / Cancel · progress bars · queue · shared</div>
+    </div>
+    <div class="shot">
+      <div style="background:#0a246a;color:#fff;padding:2px 6px">vMule - Search</div>
+      <div>Boolean search · Kad / ED2K / Global · type filters</div>
+    </div>
+  </div>
+  <p style="margin-top:14px"><a class="btn" href="/client/">Open the live client</a> &nbsp; <a class="btn" href="/panel/">Open control panel</a></p>
+`));
+vmuleReady();
+</script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>vMule-Project.net - Shop · Servers</title>
+  <link rel="stylesheet" href="/website/css/site.css">
+  <link rel="icon" href="/website/img/logo.svg">
+</head>
+<body>
+<script src="/website/js/chrome.js"></script>
+<script>
+document.write(vmuleChrome(`
+  <h2>Shop — vMule servers</h2>
+  <p>Buy a High-ID node or a dedicated ED2K server. Checkout is Stripe-hosted. After payment the node is injected into your client server list and can be controlled from the panel.</p>
+  <div class="notice" id="stripe-note">Checking payment mode...</div>
+  <div class="plans" id="plans"></div>
+  <h3>Your purchases</h3>
+  <table class="std" id="purchases"><tr><th>Plan</th><th>Status</th><th>When</th></tr></table>
+`));
+vmuleReady();
+
+function money(cents, cur) {
+  return new Intl.NumberFormat("en-US", { style: "currency", currency: (cur || "usd").toUpperCase() }).format(cents / 100);
+}
+
+fetch("/api/plans").then(r => r.json()).then(data => {
+  document.getElementById("stripe-note").textContent = data.stripeConfigured
+    ? "Stripe is configured. You will be redirected to a Stripe Checkout page."
+    : "Stripe keys are not set. Checkout runs in demo mode and activates the server immediately. Add STRIPE_SECRET_KEY in .env for real payments.";
+  const root = document.getElementById("plans");
+  Object.values(data.plans).forEach((plan, i) => {
+    const el = document.createElement("div");
+    el.className = "plan" + (plan.id === "pro" ? " featured" : "");
+    el.innerHTML = `
+      <h3>${plan.name}</h3>
+      <div class="price">${money(plan.amount, plan.currency)} <small>${plan.interval ? "/" + plan.interval : "one-time"}</small></div>
+      <p class="muted">${plan.tagline}</p>
+      <ul>${plan.features.map(f => `<li>${f}</li>`).join("")}</ul>
+      <button class="btn gold" data-plan="${plan.id}">Buy with Stripe</button>
+    `;
+    root.appendChild(el);
+  });
+  root.querySelectorAll("button[data-plan]").forEach(btn => {
+    btn.onclick = async () => {
+      btn.disabled = true;
+      btn.textContent = "Redirecting...";
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ planId: btn.dataset.plan }),
+      });
+      const json = await res.json();
+      if (json.url) location.href = json.url;
+      else {
+        alert(json.error || "Checkout failed");
+        btn.disabled = false;
+        btn.textContent = "Buy with Stripe";
+      }
+    };
+  });
+  const t = document.getElementById("purchases");
+  (data.purchases || []).forEach(p => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${p.planName}</td><td>paid${p.demo ? " (demo)" : ""}</td><td>${p.paidAt || ""}</td>`;
+    t.appendChild(tr);
+  });
+});
+</script>
+</body>
+</html>

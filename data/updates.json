@@ -1,0 +1,28 @@
+[
+  {
+    "id": "upd-050a",
+    "version": "0.50a",
+    "channel": "stable",
+    "title": "vMule 0.50a released",
+    "changelog": "Official stable release. Improved Kad bootstrap, obfuscation, credit system, and remote control panel. Installer includes all language files.",
+    "download_url": "https://github.com/enesyalii/vMule/releases/latest/download/vMule-Setup-0.50.0.exe",
+    "filename": "vMule-Setup-0.50.0.exe",
+    "size": "4.8 MB",
+    "published": true,
+    "created_at": "2024-06-01T12:00:00Z",
+    "updated_at": "2024-06-01T12:00:00Z"
+  },
+  {
+    "id": "upd-070b",
+    "version": "0.70b",
+    "channel": "community",
+    "title": "Community build 0.70b",
+    "changelog": "Community edition with extra protocol hardening, IPv6 Kad nodes, and the Reloaded control skin. Use if you want newer features over the conservative official branch.",
+    "download_url": "https://github.com/enesyalii/vMule/releases/latest/download/vMule-Setup-0.50.0.exe",
+    "filename": "vMule-Setup-0.50.0.exe",
+    "size": "5.1 MB",
+    "published": true,
+    "created_at": "2025-11-12T09:00:00Z",
+    "updated_at": "2025-11-12T09:00:00Z"
+  }
+]

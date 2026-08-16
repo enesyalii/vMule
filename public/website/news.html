@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>vMule-Project.net - News</title>
+  <link rel="stylesheet" href="/website/css/site.css">
+  <link rel="icon" href="/website/img/logo.svg">
+</head>
+<body>
+<script src="/website/js/chrome.js"></script>
+<script>
+document.write(vmuleChrome(`
+  <h2>News</h2>
+  <p class="muted">Official notes from the vMule team. Software updates are published from the separate Python admin panel and appear here automatically.</p>
+  <div id="news-list">Loading...</div>
+`));
+vmuleReady();
+fetch("/api/updates").then(r => r.json()).then(list => {
+  const el = document.getElementById("news-list");
+  el.innerHTML = list.map(u => `
+    <div class="feature">
+      <div>
+        <h3>${u.title}</h3>
+        <p class="muted">${u.channel} · ${u.version} · ${new Date(u.updated_at || u.created_at).toUTCString()}</p>
+        <p>${u.changelog}</p>
+        <p><a href="download.html">Download ${u.filename}</a></p>
+      </div>
+    </div>
+  `).join("") || "<p>No published updates yet.</p>";
+});
+</script>
+</body>
+</html>

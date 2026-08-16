@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>vMule</title>
+  <link rel="stylesheet" href="css/client.css">
+  <link rel="icon" href="/website/img/logo.svg">
+</head>
+<body>
+  <div class="win">
+    <div class="titlebar">
+      <img src="/website/img/logo.svg" alt="">
+      <span id="win-title">vMule v0.50a</span>
+      <div class="caption">
+        <button title="Minimize">_</button>
+        <button title="Maximize">□</button>
+        <button class="x" title="Close" onclick="location.href='/'">×</button>
+      </div>
+    </div>
+    <div class="menubar">
+      <span>File</span><span>View</span><span>Tools</span><span>Window</span><span>Help</span>
+      <a href="/" class="mlink">Website</a>
+      <a href="/panel/" class="mlink">Web interface</a>
+      <a href="/shop.html" class="mlink">Buy server</a>
+    </div>
+    <div class="toolbar">
+      <button id="btn-connect"><div class="ticon c1"></div>Connect</button>
+      <button id="btn-disconnect"><div class="ticon c2"></div>Cancel</button>
+      <button data-tab="search"><div class="ticon c3"></div>Search</button>
+      <button data-tab="transfer"><div class="ticon c4"></div>Transfer</button>
+      <button data-tab="shared"><div class="ticon c5"></div>Shared</button>
+      <button data-tab="messages"><div class="ticon c6"></div>Messages</button>
+      <button data-tab="stats"><div class="ticon c7"></div>Statistics</button>
+      <button data-tab="prefs"><div class="ticon c8"></div>Options</button>
+    </div>
+    <div class="tabs" id="tabs">
+      <button data-tab="servers">Servers</button>
+      <button data-tab="search">Search</button>
+      <button data-tab="transfer" class="on">Transfer</button>
+      <button data-tab="shared">Shared Files</button>
+      <button data-tab="messages">Messages</button>
+      <button data-tab="irc">IRC</button>
+      <button data-tab="stats">Statistics</button>
+      <button data-tab="kad">Kad</button>
+      <button data-tab="prefs">Preferences</button>
+    </div>
+    <div class="workspace">
+      <section id="view-servers" class="view">
+        <div class="split-top">
+          <table class="lv" id="tbl-servers">
+            <thead><tr><th>Server Name</th><th>IP</th><th>Description</th><th>Ping</th><th>Users</th><th>Files</th><th>Static</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="split-bar">Add server / server.met</div>
+        <div class="formrow">
+          <label>IP <input id="srv-ip" placeholder="1.2.3.4"></label>
+          <label>Port <input id="srv-port" value="4661" size="6"></label>
+          <label>Name <input id="srv-name" placeholder="My server"></label>
+          <button id="srv-add">Add</button>
+          <button id="srv-connect">Connect to selected</button>
+          <button id="srv-remove">Remove</button>
+        </div>
+      </section>
+
+      <section id="view-search" class="view">
+        <div class="formrow">
+          <input id="q" placeholder="Search term (legal / public-domain catalog)" size="40">
+          <select id="q-type">
+            <option>Any</option><option>Archive</option><option>Audio</option>
+            <option>Video</option><option>Program</option><option>Document</option>
+          </select>
+          <select id="q-net">
+            <option value="kad">Kad</option>
+            <option value="local">Local server</option>
+            <option value="global">Global</option>
+          </select>
+          <button id="q-go">Search</button>
+        </div>
+        <table class="lv" id="tbl-search">
+          <thead><tr><th>File Name</th><th>Size</th><th>Sources</th><th>Type</th><th>Hash</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <div class="formrow"><button id="q-dl">Download selected</button></div>
+      </section>
+
+      <section id="view-transfer" class="view on">
+        <div class="pane-label">Downloads</div>
+        <div class="split-top">
+          <table class="lv" id="tbl-down">
+            <thead><tr><th>File Name</th><th>Size</th><th>Transferred</th><th>Completed</th><th>Speed</th><th>Sources</th><th>Priority</th><th>Status</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="formrow">
+          <button data-dl="resume">Resume</button>
+          <button data-dl="pause">Pause</button>
+          <button data-dl="cancel">Cancel</button>
+          <button data-dl="prioup">Prio up</button>
+          <button data-dl="priodown">Prio down</button>
+          <label>ed2k:// <input id="ed2k" size="48" placeholder="ed2k://|file|name|size|hash|/"></label>
+          <button id="ed2k-add">Add link</button>
+        </div>
+        <div class="pane-label">Uploading</div>
+        <table class="lv" id="tbl-up">
+          <thead><tr><th>User</th><th>File</th><th>Transferred</th><th>Speed</th><th>Software</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </section>
+
+      <section id="view-shared" class="view">
+        <table class="lv" id="tbl-shared">
+          <thead><tr><th>File Name</th><th>Size</th><th>Requests</th><th>Accepted</th><th>Transferred</th><th>Priority</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <div class="formrow"><button id="shared-reload">Reload</button></div>
+      </section>
+
+      <section id="view-messages" class="view">
+        <div id="msg-log" class="logbox"></div>
+        <div class="formrow">
+          <input id="msg-text" size="60" placeholder="Message to friends / room">
+          <button id="msg-send">Send</button>
+        </div>
+      </section>
+
+      <section id="view-irc" class="view">
+        <p class="hint">IRC client — #vmule. This is a local echo room for the demo client.</p>
+        <div id="irc-log" class="logbox"></div>
+        <div class="formrow">
+          <input id="irc-text" size="60" placeholder="Message #vmule">
+          <button id="irc-send">Send</button>
+        </div>
+      </section>
+
+      <section id="view-stats" class="view">
+        <div class="statsgrid">
+          <canvas id="speed-canvas" width="640" height="180"></canvas>
+          <div id="stats-text" class="logbox"></div>
+        </div>
+      </section>
+
+      <section id="view-kad" class="view">
+        <div class="formrow">
+          <button id="kad-start">Connect Kad</button>
+          <button id="kad-stop">Disconnect Kad</button>
+        </div>
+        <div id="kad-info" class="logbox"></div>
+      </section>
+
+      <section id="view-prefs" class="view">
+        <div class="prefs">
+          <fieldset><legend>General</legend>
+            <label>Nickname <input id="set-nick"></label>
+          </fieldset>
+          <fieldset><legend>Connection</legend>
+            <label>Max download KB/s (0=unlimited) <input id="set-down" type="number"></label>
+            <label>Max upload KB/s <input id="set-up" type="number"></label>
+            <label>TCP port <input id="set-port" type="number"></label>
+            <label>UDP port <input id="set-udp" type="number"></label>
+            <label>Max connections <input id="set-conn" type="number"></label>
+            <label><input id="set-obf" type="checkbox"> Protocol obfuscation</label>
+          </fieldset>
+          <fieldset><legend>Webinterface</legend>
+            <label><input id="set-web" type="checkbox"> Enable webinterface (aMule-style panel)</label>
+            <label>Web port <input id="set-webport" type="number"></label>
+            <p class="hint">Open <a href="/panel/" target="_blank">/panel/</a> — sign in with the password from your environment, not from this window.</p>
+          </fieldset>
+          <button id="set-save">Apply</button>
+        </div>
+      </section>
+    </div>
+    <div class="statusbar" id="status"></div>
+  </div>
+  <script src="js/client.js"></script>
+</body>
+</html>

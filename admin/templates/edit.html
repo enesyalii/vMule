@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}{{ "Edit" if item else "New" }} update · vMule Admin{% endblock %}
+{% block body %}
+<div class="card">
+  <h2>{{ "Edit update" if item else "New update" }}</h2>
+  <form method="post">
+    <label>Version</label>
+    <input name="version" required value="{{ item.version if item else "" }}" placeholder="0.50a">
+    <label>Channel</label>
+    <select name="channel">
+      {% set ch = item.channel if item else "stable" %}
+      <option value="stable" {% if ch == "stable" %}selected{% endif %}>stable (official)</option>
+      <option value="community" {% if ch == "community" %}selected{% endif %}>community</option>
+      <option value="beta" {% if ch == "beta" %}selected{% endif %}>beta</option>
+    </select>
+    <label>Title</label>
+    <input name="title" required value="{{ item.title if item else "" }}">
+    <label>Changelog</label>
+    <textarea name="changelog">{{ item.changelog if item else "" }}</textarea>
+    <label>Filename</label>
+    <input name="filename" value="{{ item.filename if item else "" }}" placeholder="vMule-0.50a-Installer.exe">
+    <label>Download URL</label>
+    <input name="download_url" value="{{ item.download_url if item else "" }}" placeholder="/downloads/vMule-0.50a-Installer.exe">
+    <label>Size</label>
+    <input name="size" value="{{ item.size if item else "" }}" placeholder="4.8 MB">
+    <label><input type="checkbox" name="published" {% if not item or item.published %}checked{% endif %} style="width:auto"> Published (shows on website Download/News)</label>
+    <div class="row">
+      <button type="submit">Save</button>
+      <a class="btn ghost" href="{{ url_for('index') }}">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

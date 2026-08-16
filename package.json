@@ -1,0 +1,57 @@
+{
+  "name": "vmule",
+  "version": "0.50.0",
+  "description": "vMule — eMule-like P2P client, website, control panel, and Stripe server shop",
+  "main": "electron/main.js",
+  "author": "vMule",
+  "license": "GPL-2.0-or-later",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node server/index.js",
+    "electron": "electron .",
+    "build:win": "electron-builder --win nsis"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "stripe": "^22.4.0",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "electron": "^37.2.6",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "net.vmule.client",
+    "productName": "vMule",
+    "copyright": "vMule",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "electron/**/*",
+      "server/**/*",
+      "public/**/*",
+      "data/updates.json",
+      "package.json"
+    ],
+    "win": {
+      "icon": "build/icon.png",
+      "target": ["nsis"]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "vMule",
+      "artifactName": "vMule-Setup-${version}.exe"
+    }
+  }
+}

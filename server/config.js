@@ -17,7 +17,7 @@ module.exports = {
   STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET || "",
   INSTALLER_URL:
     process.env.INSTALLER_URL ||
-    "https://github.com/enesyalii/vMule/releases/latest/download/vMule-Setup-0.50.0.exe",
+    "https://github.com/enesyalii/vMule/releases/latest/download/vMule-Setup-0.51.0.exe",
   VMLF_TCP_PORT: Number(process.env.VMLF_TCP_PORT || 4662),
   VMLF_TCP_ENABLED: process.env.VMLF_TCP_ENABLED !== "0",
   publicDir: path.join(__dirname, "..", "public"),

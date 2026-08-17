@@ -34,7 +34,7 @@
       </div>
     </div>
     <div class="verbox" id="verbox">
-      LatestVersion: <b>0.50a</b><br>
+      LatestVersion: <b>0.51a</b><br>
       Community: <b>0.70b</b>
     </div>
   </div>

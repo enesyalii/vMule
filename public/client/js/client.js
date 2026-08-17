@@ -213,7 +213,7 @@ function render() {
   if (!state) return;
   const vf = vmlf();
   const srv = state.servers.find((s) => s.id === vf.serverId);
-  $("#win-title").textContent = `vMule v0.50a  [${state.nickname}]`;
+  $("#win-title").textContent = `vMule v0.51a  [${state.nickname}]`;
 
   const ledV = $("#led-vmlf");
   ledV.className = "sb-led " + (vf.connected ? "on" : "off");

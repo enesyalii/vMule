@@ -92,7 +92,7 @@ function createInitialState() {
     nickname: "vMuleUser",
     downloads,
     uploads: [
-      { id: uuid(), user: "lothar[DE]", file: "BigBuckBunny-2008-1080p-CC-BY.mp4", speed: 22000, xfer: 4_200_000, software: "vMule 0.50a" },
+      { id: uuid(), user: "lothar[DE]", file: "BigBuckBunny-2008-1080p-CC-BY.mp4", speed: 22000, xfer: 4_200_000, software: "vMule 0.51a" },
       { id: uuid(), user: "kademlia_fan", file: "VLC-3.0.21-win64.exe", speed: 14000, xfer: 1_100_000, software: "aMule 2.3.3" },
     ],
     queue: [
@@ -113,7 +113,7 @@ function createInitialState() {
       ],
     },
     logs: [
-      `[${stamp()}] vMule 0.50a started`,
+      `[${stamp()}] vMule 0.51a started`,
       `[${stamp()}] Loading server.met ... 4 servers`,
       `[${stamp()}] Connected to vMule Razorback (High ID)`,
       `[${stamp()}] Kad: connected, not firewalled`,

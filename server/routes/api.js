@@ -11,7 +11,7 @@ function createClientRoutes(engine, stripe) {
     res.json({
       ok: true,
       name: "vMule",
-      version: "0.50.0",
+      version: "0.51.0",
       protocol: "VMLF",
       stripe: Boolean(stripe),
       tcp: config.VMLF_TCP_ENABLED ? config.VMLF_TCP_PORT : null,

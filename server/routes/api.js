@@ -30,6 +30,9 @@ function createClientRoutes(engine, stripe, polar, requireUser) {
     res.json({ items: engine.getCatalog() });
   });
 
+  // Network state, logs, and all mutations require an account.
+  router.use(requireUser);
+
   router.get("/state", (_req, res) => {
     res.json(engine.snapshot());
   });
@@ -47,9 +50,6 @@ function createClientRoutes(engine, stripe, polar, requireUser) {
     engine.on("update", push);
     req.on("close", () => engine.off("update", push));
   });
-
-  // Reading status is public; changing the running client requires an account.
-  router.use(requireUser);
 
   router.post("/connect", (_req, res) => res.json(engine.connect()));
   router.post("/disconnect", (_req, res) => res.json(engine.disconnect()));

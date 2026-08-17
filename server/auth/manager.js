@@ -9,9 +9,9 @@ const {
 } = require("./accounts");
 
 function secureTextEqual(left, right) {
-  const a = Buffer.from(String(left));
-  const b = Buffer.from(String(right));
-  return a.length === b.length && crypto.timingSafeEqual(a, b);
+  const a = crypto.createHash("sha256").update(String(left)).digest();
+  const b = crypto.createHash("sha256").update(String(right)).digest();
+  return crypto.timingSafeEqual(a, b);
 }
 
 class AccountManager {

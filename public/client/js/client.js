@@ -93,6 +93,10 @@ async function api(path, opts = {}) {
   }
   const res = await fetch(path, init);
   const data = await res.json().catch(() => ({}));
+  if (res.status === 401) {
+    location.replace(`/account/?next=${encodeURIComponent("/client/")}`);
+    throw new Error("Sign in required");
+  }
   if (!res.ok) {
     const err = data.error || `Request failed (${res.status})`;
     toast(err, true);

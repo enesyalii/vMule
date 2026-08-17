@@ -52,7 +52,7 @@ function adminSnapshot(engine, accounts) {
 
 function createAdminRoutes(engine, accounts) {
   const router = express.Router();
-  router.use(requireAdmin);
+  router.use("/admin", requireAdmin);
 
   router.get("/admin/overview", async (_req, res, next) => {
     try {

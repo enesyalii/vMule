@@ -25,11 +25,9 @@ function snapshot(state) {
   };
 }
 
-function loadState(createInitialState) {
-  const saved = store.readJson(STATE_FILE, null);
-  if (!saved || typeof saved !== "object") return createInitialState();
-  const fresh = createInitialState();
-  const merged = migrateState({
+function mergeState(fresh, saved) {
+  if (!saved || typeof saved !== "object") return fresh;
+  return migrateState({
     ...fresh,
     ...saved,
     vmlf: { ...fresh.vmlf, ...(saved.vmlf || saved.ed2k || {}) },
@@ -39,11 +37,15 @@ function loadState(createInitialState) {
     irc: saved.irc || fresh.irc,
     purchases: fresh.purchases,
   });
-  return merged;
+}
+
+function loadState(createInitialState) {
+  const saved = store.readJson(STATE_FILE, null);
+  return mergeState(createInitialState(), saved);
 }
 
 function saveState(state) {
   store.writeJson(STATE_FILE, snapshot(state));
 }
 
-module.exports = { loadState, saveState, snapshot };
+module.exports = { loadState, saveState, snapshot, mergeState };

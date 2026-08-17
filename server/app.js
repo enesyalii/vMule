@@ -3,6 +3,7 @@ const cors = require("cors");
 const { Stripe } = require("stripe");
 const config = require("./config");
 const { VmuleEngine } = require("./engine/VmuleEngine");
+const { RuntimeRepository } = require("./backend/runtime-repository");
 const { PLANS } = require("./plans");
 const { createClientRoutes, createShopRoutes } = require("./routes/api");
 const { createAuthRoutes } = require("./routes/auth");
@@ -25,6 +26,7 @@ const {
 
 function createApp() {
   const engine = new VmuleEngine();
+  const runtime = new RuntimeRepository();
   const accounts = new AccountManager();
   const stripe = config.STRIPE_SECRET_KEY
     ? new Stripe(config.STRIPE_SECRET_KEY, { apiVersion: "2026-07-29.dahlia" })
@@ -47,30 +49,38 @@ function createApp() {
     } catch (err) {
       return res.status(400).send(`Webhook Error: ${err.message}`);
     }
-    if (event.type === "checkout.session.completed") {
-      const session = event.data.object;
-      const planId = session.metadata?.plan_id;
-      const plan = PLANS[planId];
-      engine.fulfillPurchase({
-        id: session.id,
-        planId,
-        planName: plan ? plan.name : "vMule server",
-        amount: session.amount_total,
-        currency: session.currency,
-        customerEmail: session.customer_details?.email,
-        mode: session.mode,
-        provider: "stripe",
-        accountId: session.metadata?.account_id || null,
-        paidAt: new Date().toISOString(),
-      });
+    try {
+      if (event.type === "checkout.session.completed") {
+        await runtime.hydrate(engine, { force: config.isServerless });
+        const session = event.data.object;
+        const planId = session.metadata?.plan_id;
+        const plan = PLANS[planId];
+        engine.fulfillPurchase({
+          id: session.id,
+          planId,
+          planName: plan ? plan.name : "vMule server",
+          amount: session.amount_total,
+          currency: session.currency,
+          customerEmail: session.customer_details?.email,
+          mode: session.mode,
+          provider: "stripe",
+          accountId: session.metadata?.account_id || null,
+          paidAt: new Date().toISOString(),
+        });
+        await runtime.persist(engine);
+      }
+      res.json({ received: true });
+    } catch (err) {
+      console.error("Stripe webhook persistence error:", err.message);
+      res.status(500).json({ error: "Could not persist checkout" });
     }
-    res.json({ received: true });
   }
 
-  function fulfillPolarWebhook(req, res) {
+  async function fulfillPolarWebhook(req, res) {
     try {
       const event = verifyPolarWebhook(req.body, req.headers);
       if (event.type === "order.paid") {
+        await runtime.hydrate(engine, { force: config.isServerless });
         const order = event.data;
         const planId = planIdFromPolarPayload(order);
         const plan = PLANS[planId];
@@ -89,6 +99,7 @@ function createApp() {
             null,
           paidAt: new Date().toISOString(),
         });
+        await runtime.persist(engine);
       }
       res.status(202).send("");
     } catch (err) {
@@ -111,24 +122,63 @@ function createApp() {
   app.use(express.json({ limit: "2mb" }));
   app.use(express.urlencoded({ extended: true }));
 
+  app.use("/api", async (_req, res, next) => {
+    try {
+      await runtime.hydrate(engine, { force: config.isServerless });
+      const revision = engine.revision;
+      const sendJson = res.json.bind(res);
+      let sending = false;
+      res.json = (body) => {
+        if (sending) return res;
+        if (engine.revision === revision) return sendJson(body);
+        sending = true;
+        runtime
+          .persist(engine)
+          .then(() => sendJson(body))
+          .catch((err) => {
+            res.json = sendJson;
+            next(err);
+          });
+        return res;
+      };
+      next();
+    } catch (err) {
+      next(err);
+    }
+  });
   app.use("/api", apiTick);
   app.use("/api", createAuthMiddleware(accounts));
   app.use("/api", createAuthRoutes(accounts));
-  app.use("/api", createAdminRoutes(engine, accounts));
+  app.use("/api", createAdminRoutes(engine, accounts, runtime));
   app.use("/api", createShopRoutes(engine, stripe, polar, requireUser));
-  app.use("/api", createClientRoutes(engine, stripe, polar, requireUser));
+  app.use(
+    "/api",
+    createClientRoutes(engine, stripe, polar, requireUser, runtime)
+  );
 
   mountStatic(app);
   app.use(errorHandler);
 
-  return { app, engine, stripe, polar, accounts };
+  return { app, engine, stripe, polar, accounts, runtime };
 }
 
 function startServer() {
   const boot = createApp();
 
   if (!config.isServerless) {
-    setInterval(() => boot.engine.tick(), 1000);
+    boot.runtime.hydrate(boot.engine).catch((err) => {
+      console.error(`Backend hydration failed: ${err.message}`);
+    });
+    let ticks = 0;
+    setInterval(() => {
+      boot.engine.tick();
+      ticks += 1;
+      if (ticks % 5 === 0) {
+        boot.runtime.persist(boot.engine).catch((err) => {
+          console.error(`Backend persistence failed: ${err.message}`);
+        });
+      }
+    }, 1000);
   }
 
   let tcpServer = null;
@@ -147,6 +197,7 @@ function startServer() {
     console.log(`API events     http://localhost:${config.PORT}/api/events (SSE)`);
     console.log(`Stripe         ${boot.stripe ? "keys loaded" : "demo mode (no STRIPE_SECRET_KEY)"}`);
     console.log(`Polar          ${boot.polar ? "keys loaded" : "demo mode (no POLAR_ACCESS_TOKEN)"}`);
+    console.log(`Backend        ${boot.runtime.mode}`);
     if (config.isServerless) console.log(`Serverless     tick-on-request enabled`);
   });
 

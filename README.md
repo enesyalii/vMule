@@ -41,10 +41,12 @@ registered account becomes administrator when no administrator exists. You can
 also configure a durable environment administrator with `ADMIN_USER` and
 `ADMIN_PASSWORD`.
 
-Local development stores accounts in the ignored `data/accounts.json` file.
-For Vercel or multi-instance deployments, set `DATABASE_URL` to PostgreSQL;
-the `vmule_users` table is created automatically. Also set a long random
-`AUTH_SECRET`. Registration can be disabled with `ALLOW_REGISTRATION=0`.
+Local development stores accounts and runtime state in ignored JSON files.
+For Vercel or multi-instance deployments, set `DATABASE_URL` to PostgreSQL.
+The backend automatically creates `vmule_users`, `vmule_runtime_state`, and
+`vmule_purchases`, then hydrates and persists the engine on every serverless
+request. Also set a long random `AUTH_SECRET`. Registration can be disabled
+with `ALLOW_REGISTRATION=0`.
 
 The administrator console at `/server-admin/` manages VMLF/Kad connections,
 transfers, servers, runtime settings, logs, and user roles.

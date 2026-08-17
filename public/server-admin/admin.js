@@ -88,6 +88,7 @@ function renderOverview() {
     detail("Memory", `${processInfo.memoryMb} MB`),
     detail("Runtime", processInfo.serverless ? "Vercel serverless" : "Persistent process"),
     detail("Account store", overview.storage.accounts),
+    detail("Runtime store", overview.storage.runtime),
     detail("Payments", `Stripe ${overview.payments.stripe ? "on" : "off"} · Polar ${overview.payments.polar ? "on" : "off"}`),
   ].join("");
 }

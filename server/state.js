@@ -147,8 +147,9 @@ function stamp() {
 }
 
 function publicState(state) {
+  const { purchases: _purchases, ...safeState } = state;
   return {
-    ...state,
+    ...safeState,
     downloads: state.downloads.map(decorateFile),
     shared: state.shared.map(decorateFile),
     search: {

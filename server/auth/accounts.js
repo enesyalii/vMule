@@ -3,6 +3,7 @@ const { promisify } = require("util");
 const { v4: uuid } = require("uuid");
 const store = require("../store");
 const config = require("../config");
+const { getPool, ensureSchema } = require("../db");
 
 const scrypt = promisify(crypto.scrypt);
 const FILE_NAME = "accounts.json";
@@ -83,29 +84,8 @@ class AccountStore {
 
   async _init() {
     if (this.mode !== "postgres") return;
-    const { Pool } = require("pg");
-    this.pool = new Pool({
-      connectionString: config.DATABASE_URL,
-      ssl: config.DATABASE_SSL ? { rejectUnauthorized: false } : undefined,
-      max: config.isServerless ? 2 : 10,
-      idleTimeoutMillis: 10_000,
-    });
-    await this.pool.query(`
-      CREATE TABLE IF NOT EXISTS vmule_users (
-        id UUID PRIMARY KEY,
-        username VARCHAR(32) NOT NULL UNIQUE,
-        email VARCHAR(254) NOT NULL DEFAULT '',
-        password_hash TEXT NOT NULL,
-        role VARCHAR(16) NOT NULL DEFAULT 'user',
-        status VARCHAR(16) NOT NULL DEFAULT 'active',
-        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-        last_login_at TIMESTAMPTZ
-      )
-    `);
-    await this.pool.query(
-      "CREATE UNIQUE INDEX IF NOT EXISTS vmule_users_email_unique ON vmule_users (LOWER(email)) WHERE email <> ''"
-    );
+    this.pool = getPool();
+    await ensureSchema();
   }
 
   async list() {

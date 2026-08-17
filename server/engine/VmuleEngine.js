@@ -1,7 +1,7 @@
 const { EventEmitter } = require("events");
 const { v4: uuid } = require("uuid");
 const store = require("../store");
-const { loadState, saveState } = require("../persist");
+const { loadState, saveState, mergeState } = require("../persist");
 const { parseLink } = require("../vmlf");
 const { PLANS } = require("../plans");
 const {
@@ -27,14 +27,30 @@ class VmuleEngine extends EventEmitter {
     this.purchases = store.readJson("purchases.json", []);
     this.state.purchases = this.purchases;
     this.applyPurchases();
+    this.revision = 0;
   }
 
-  snapshot() {
-    return publicState(this.state);
+  snapshot(user = null) {
+    const state = publicState(this.state);
+    if (user && user.role !== "admin") {
+      state.servers = state.servers.filter(
+        (server) => !server.ownerId || server.ownerId === user.id
+      );
+    }
+    return state;
+  }
+
+  hydrate(savedState, purchases = []) {
+    this.state = mergeState(createInitialState(), savedState);
+    this.purchases = Array.isArray(purchases) ? purchases : [];
+    this.state.purchases = this.purchases;
+    this.applyPurchases();
+    this.revision += 1;
   }
 
   commit() {
     saveState(this.state);
+    this.revision += 1;
     const snap = this.snapshot();
     this.emit("update", snap);
     return snap;
@@ -45,6 +61,7 @@ class VmuleEngine extends EventEmitter {
     vmlfConn.pulse(this.state);
     kadNet.pulse(this.state);
     if (this.state.logs.length > 400) this.state.logs.length = 400;
+    this.revision += 1;
     this.emit("update", this.snapshot());
   }
 
@@ -55,7 +72,13 @@ class VmuleEngine extends EventEmitter {
         this.state.kad.boost = true;
         continue;
       }
-      if (this.state.servers.some((s) => s.purchaseId === p.id)) continue;
+      const existingServer = this.state.servers.find((s) => s.purchaseId === p.id);
+      if (existingServer) {
+        if (!existingServer.ownerId && p.accountId) {
+          existingServer.ownerId = p.accountId;
+        }
+        continue;
+      }
       const plan = PLANS[p.planId];
       if (!plan) continue;
       this.state.servers.unshift({
@@ -71,6 +94,7 @@ class VmuleEngine extends EventEmitter {
         static: true,
         premium: true,
         purchaseId: p.id,
+        ownerId: p.accountId || null,
       });
     }
   }
@@ -160,7 +184,7 @@ class VmuleEngine extends EventEmitter {
     return { ok: true, state: this.commit() };
   }
 
-  addServer({ ip, port, name }) {
+  addServer({ ip, port, name }, actor = null) {
     if (!ip || !port) return { error: "ip and port required" };
     this.state.servers.push({
       id: uuid(),
@@ -174,16 +198,29 @@ class VmuleEngine extends EventEmitter {
       ping: 0,
       static: false,
       premium: false,
+      ownerId: actor && actor.role !== "admin" ? actor.id : null,
     });
     return this.commit();
   }
 
-  connectServer(id) {
+  canAccessServer(id, actor = null) {
+    const server = this.state.servers.find((item) => item.id === id);
+    if (!server) return false;
+    if (!server.ownerId) return !server.premium || actor?.role === "admin";
+    return actor?.role === "admin" || server.ownerId === actor?.id;
+  }
+
+  connectServer(id, actor = null) {
+    if (!this.canAccessServer(id, actor)) return null;
     if (!vmlfConn.connectServer(this.state, id)) return null;
     return this.commit();
   }
 
-  removeServer(id) {
+  removeServer(id, actor = null) {
+    if (!this.canAccessServer(id, actor)) return null;
+    const target = this.state.servers.find((server) => server.id === id);
+    if (!target) return null;
+    if (!target.ownerId && actor?.role !== "admin") return null;
     this.state.servers = this.state.servers.filter((s) => s.id !== id);
     return this.commit();
   }

@@ -2,7 +2,7 @@ const express = require("express");
 const config = require("../config");
 const { requireAdmin } = require("../auth/session");
 
-function adminSnapshot(engine, accounts) {
+function adminSnapshot(engine, accounts, runtime) {
   const state = engine.snapshot();
   return {
     generatedAt: new Date().toISOString(),
@@ -14,9 +14,12 @@ function adminSnapshot(engine, accounts) {
     },
     storage: {
       accounts: accounts.store.mode,
+      runtime: runtime.mode,
       persistent:
-        accounts.store.mode === "postgres" ||
-        (!config.isServerless && accounts.store.mode === "file"),
+        (accounts.store.mode === "postgres" && runtime.mode === "postgres") ||
+        (!config.isServerless &&
+          accounts.store.mode === "file" &&
+          runtime.mode === "file"),
     },
     payments: {
       stripe: Boolean(config.STRIPE_SECRET_KEY),
@@ -50,14 +53,15 @@ function adminSnapshot(engine, accounts) {
   };
 }
 
-function createAdminRoutes(engine, accounts) {
+function createAdminRoutes(engine, accounts, runtime) {
   const router = express.Router();
   router.use("/admin", requireAdmin);
 
   router.get("/admin/overview", async (_req, res, next) => {
     try {
-      const snapshot = adminSnapshot(engine, accounts);
+      const snapshot = adminSnapshot(engine, accounts, runtime);
       snapshot.counts.accounts = (await accounts.list()).length;
+      snapshot.storage.health = await runtime.health();
       res.json(snapshot);
     } catch (err) {
       next(err);
@@ -99,19 +103,21 @@ function createAdminRoutes(engine, accounts) {
   });
 
   router.post("/admin/servers", (req, res) => {
-    const result = engine.addServer(req.body || {});
+    const result = engine.addServer(req.body || {}, req.user);
     if (result?.error) return res.status(400).json({ error: result.error });
     res.json(result);
   });
 
   router.post("/admin/servers/:id/connect", (req, res) => {
-    const result = engine.connectServer(req.params.id);
+    const result = engine.connectServer(req.params.id, req.user);
     if (!result) return res.status(404).json({ error: "Server not found" });
     res.json(result);
   });
 
   router.delete("/admin/servers/:id", (req, res) => {
-    res.json(engine.removeServer(req.params.id));
+    const result = engine.removeServer(req.params.id, req.user);
+    if (!result) return res.status(404).json({ error: "Server not found" });
+    res.json(result);
   });
 
   router.post("/admin/downloads/:id/:command", (req, res) => {

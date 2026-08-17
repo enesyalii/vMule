@@ -6,20 +6,25 @@ const { createCheckoutSession } = require("../stripe");
 const { createPolarCheckout } = require("../polar");
 const config = require("../config");
 
-function createClientRoutes(engine, stripe, polar, requireUser) {
+function createClientRoutes(engine, stripe, polar, requireUser, runtime) {
   const router = express.Router();
 
-  router.get("/health", (_req, res) => {
-    res.json({
-      ok: true,
-      name: "vMule",
-      version: "0.51.0",
-      protocol: "VMLF",
-      stripe: Boolean(stripe),
-      polar: Boolean(polar),
-      serverless: config.isServerless,
-      tcp: config.VMLF_TCP_ENABLED ? config.VMLF_TCP_PORT : null,
-    });
+  router.get("/health", async (_req, res, next) => {
+    try {
+      res.json({
+        ok: true,
+        name: "vMule",
+        version: "0.51.0",
+        protocol: "VMLF",
+        stripe: Boolean(stripe),
+        polar: Boolean(polar),
+        backend: await runtime.health(),
+        serverless: config.isServerless,
+        tcp: config.VMLF_TCP_ENABLED ? config.VMLF_TCP_PORT : null,
+      });
+    } catch (err) {
+      next(err);
+    }
   });
 
   router.get("/updates", (_req, res) => {
@@ -34,7 +39,7 @@ function createClientRoutes(engine, stripe, polar, requireUser) {
   router.use(requireUser);
 
   router.get("/state", (_req, res) => {
-    res.json(engine.snapshot());
+    res.json(engine.snapshot(_req.user));
   });
 
   router.get("/events", (req, res) => {
@@ -43,71 +48,94 @@ function createClientRoutes(engine, stripe, polar, requireUser) {
     res.setHeader("Connection", "keep-alive");
     res.flushHeaders?.();
 
-    const push = (snap) => {
-      res.write(`data: ${JSON.stringify(snap)}\n\n`);
+    const push = () => {
+      res.write(`data: ${JSON.stringify(engine.snapshot(req.user))}\n\n`);
     };
-    push(engine.snapshot());
+    push();
     engine.on("update", push);
     req.on("close", () => engine.off("update", push));
   });
 
-  router.post("/connect", (_req, res) => res.json(engine.connect()));
-  router.post("/disconnect", (_req, res) => res.json(engine.disconnect()));
-  router.post("/kad/start", (_req, res) => res.json(engine.kadStart()));
-  router.post("/kad/stop", (_req, res) => res.json(engine.kadStop()));
+  router.post("/connect", (req, res) => {
+    engine.connect();
+    res.json(engine.snapshot(req.user));
+  });
+  router.post("/disconnect", (req, res) => {
+    engine.disconnect();
+    res.json(engine.snapshot(req.user));
+  });
+  router.post("/kad/start", (req, res) => {
+    engine.kadStart();
+    res.json(engine.snapshot(req.user));
+  });
+  router.post("/kad/stop", (req, res) => {
+    engine.kadStop();
+    res.json(engine.snapshot(req.user));
+  });
 
   router.post("/downloads/:id/:cmd", (req, res) => {
     const st = engine.downloadCmd(req.params.id, req.params.cmd);
     if (!st) return res.status(404).json({ error: "not found" });
-    res.json(st);
+    res.json(engine.snapshot(req.user));
   });
 
-  router.post("/search", (req, res) => res.json(engine.search(req.body)));
+  router.post("/search", (req, res) => {
+    engine.search(req.body);
+    res.json(engine.snapshot(req.user));
+  });
   router.post("/search/download", (req, res) => {
     const hash = req.body?.hash;
     const st = engine.searchDownload(hash);
     if (!st) return res.status(404).json({ error: "result not found" });
-    res.json(st);
+    res.json(engine.snapshot(req.user));
   });
 
   const addLink = (req, res) => {
     const result = engine.addVmlfLink(req.body?.link);
     if (result.error) return res.status(400).json({ error: result.error });
-    res.json(result.state);
+    res.json(engine.snapshot(req.user));
   };
   router.post("/vmlf", addLink);
   router.post("/ed2k", addLink);
 
   router.post("/servers", (req, res) => {
-    const result = engine.addServer(req.body || {});
+    const result = engine.addServer(req.body || {}, req.user);
     if (result?.error) return res.status(400).json({ error: result.error });
-    res.json(result);
+    res.json(engine.snapshot(req.user));
   });
 
   router.post("/servers/:id/connect", (req, res) => {
-    const st = engine.connectServer(req.params.id);
+    const st = engine.connectServer(req.params.id, req.user);
     if (!st) return res.status(404).json({ error: "not found" });
-    res.json(st);
+    res.json(engine.snapshot(req.user));
   });
 
   router.post("/servers/:id/remove", (req, res) => {
-    res.json(engine.removeServer(req.params.id));
+    const result = engine.removeServer(req.params.id, req.user);
+    if (!result) return res.status(404).json({ error: "Server not found or unavailable" });
+    res.json(engine.snapshot(req.user));
   });
 
-  router.post("/shared/reload", (_req, res) => res.json(engine.reloadShared()));
+  router.post("/shared/reload", (req, res) => {
+    engine.reloadShared();
+    res.json(engine.snapshot(req.user));
+  });
 
   router.get("/logs", (req, res) => {
     if (req.query.reset === "1") engine.resetLogs();
     res.json({ logs: engine.getLogs() });
   });
 
-  router.put("/settings", (req, res) => res.json(engine.updateSettings(req.body)));
+  router.put("/settings", (req, res) => {
+    engine.updateSettings(req.body);
+    res.json(engine.snapshot(req.user));
+  });
 
   router.post("/messages", (req, res) => {
     const text = String(req.body?.text || "").trim();
     const result = engine.addMessage(text);
     if (result?.error) return res.status(400).json({ error: result.error });
-    res.json(result);
+    res.json(engine.snapshot(req.user));
   });
 
   router.get("/irc", (_req, res) => res.json(engine.getIrc()));
@@ -116,7 +144,7 @@ function createClientRoutes(engine, stripe, polar, requireUser) {
     const text = String(req.body?.text || "").trim();
     const result = engine.addIrcMessage(text);
     if (result?.error) return res.status(400).json({ error: result.error });
-    res.json(result);
+    res.json(engine.snapshot(req.user));
   });
 
   return router;

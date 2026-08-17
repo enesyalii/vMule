@@ -38,6 +38,8 @@
       "server/**/*",
       "public/**/*",
       "data/updates.json",
+      "data/catalog.json",
+      "data/servers.json",
       "package.json"
     ],
     "win": {

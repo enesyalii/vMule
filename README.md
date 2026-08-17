@@ -52,7 +52,7 @@ Without keys, the shop runs in demo mode.
 
 ```
 electron/        Desktop shell
-server/          Node API
+server/          Node API (VmuleEngine, VMLF TCP, REST + SSE)
 public/website/  Project site
 public/client/   Client UI
 public/panel/    Remote control UI

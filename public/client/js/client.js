@@ -387,6 +387,28 @@ async function refresh() {
   }
 }
 
+function connectLive() {
+  if (typeof EventSource === "undefined") {
+    refresh();
+    setInterval(refresh, 1000);
+    return;
+  }
+  const es = new EventSource("/api/events");
+  es.onmessage = (e) => {
+    try {
+      state = JSON.parse(e.data);
+      render();
+    } catch {
+      /* ignore parse errors */
+    }
+  };
+  es.onerror = () => {
+    es.close();
+    refresh();
+    setInterval(refresh, 1000);
+  };
+}
+
 function cmd(path, body) {
   return api(path, { method: "POST", body })
     .then((s) => {
@@ -518,8 +540,7 @@ document.addEventListener("keydown", (e) => {
   if (e.ctrlKey && TAB_KEYS[e.key]) { e.preventDefault(); showTab(TAB_KEYS[e.key]); }
 });
 
-refresh();
-setInterval(refresh, 1000);
+connectLive();
 
 // First-run hint
 if (!sessionStorage.getItem("vmule-hint")) {

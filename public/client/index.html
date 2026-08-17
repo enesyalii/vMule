@@ -7,6 +7,19 @@
   <link rel="icon" href="/website/img/logo.svg">
 </head>
 <body>
+  <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display:none">
+    <symbol id="ico-connect" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a5 5 0 0 0-5 5v2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-9a2 2 0 0 0-2-2h-2V7a5 5 0 0 0-5-5zm-3 7V7a3 3 0 1 1 6 0v2H9z"/></symbol>
+    <symbol id="ico-disconnect" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a5 5 0 0 0-5 5v2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-9a2 2 0 0 0-2-2h-2V7a5 5 0 0 0-5-5zm-3 7V7a3 3 0 1 1 6 0v2H9zm2 5l2 2 4-4 1.4 1.4L13 17.8l-3.4-3.4L11 13z"/></symbol>
+    <symbol id="ico-search" viewBox="0 0 24 24"><path fill="currentColor" d="M10 2a8 8 0 1 0 4.9 14.3l4.4 4.4 1.4-1.4-4.4-4.4A8 8 0 0 0 10 2zm0 2a6 6 0 1 1 0 12 6 6 0 0 1 0-12z"/></symbol>
+    <symbol id="ico-transfer" viewBox="0 0 24 24"><path fill="currentColor" d="M12 3l-5 5h3v6h4v-6h3l-5-5zm-7 14h14v2H5v-2z"/></symbol>
+    <symbol id="ico-shared" viewBox="0 0 24 24"><path fill="currentColor" d="M4 4h8l2 2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm0 4v10h16V8H4z"/></symbol>
+    <symbol id="ico-messages" viewBox="0 0 24 24"><path fill="currentColor" d="M4 4h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6l-4 4V6a2 2 0 0 1 2-2zm2 4v2h12V8H6zm0 4v2h8v-2H6z"/></symbol>
+    <symbol id="ico-stats" viewBox="0 0 24 24"><path fill="currentColor" d="M4 20h2V10H4v10zm6 0h2V6H10v14zm6 0h2V14h-2v6zm6 0h2V4h-2v16z"/></symbol>
+    <symbol id="ico-prefs" viewBox="0 0 24 24"><path fill="currentColor" d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm9 4a7.9 7.9 0 0 0-.2-1.7l2-1.5-2-3.5-2.4 1a8 8 0 0 0-2.9-1.7L17.5 2h-4l-.8 2.9a8 8 0 0 0-2.9 1.7l-2.4-1-2 3.5 2 1.5a7.9 7.9 0 0 0 0 3.4l-2 1.5 2 3.5 2.4-1a8 8 0 0 0 2.9 1.7l.8 2.9h4l.8-2.9a8 8 0 0 0 2.9-1.7l2.4 1 2-3.5-2-1.5c.1-.5.2-1.1.2-1.7z"/></symbol>
+    <symbol id="ico-servers" viewBox="0 0 24 24"><path fill="currentColor" d="M4 4h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm0 10h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2zm2 2v2h2v-2H6zm4 0v2h8v-2h-8zM6 6v2h2V6H6zm4 0v2h8V6h-8z"/></symbol>
+    <symbol id="ico-irc" viewBox="0 0 24 24"><path fill="currentColor" d="M4 4h16v12H5.2L4 17.2V4zm2 2v2h12V6H6zm0 4v2h8v-2H6zm14 6l-2 2v-8h2v6z"/></symbol>
+    <symbol id="ico-kad" viewBox="0 0 24 24"><circle fill="currentColor" cx="6" cy="6" r="3"/><circle fill="currentColor" cx="18" cy="6" r="3"/><circle fill="currentColor" cx="12" cy="18" r="3"/><path fill="currentColor" d="M8.2 7.8l3.8 2.2-1.5 2.6-3.8-2.2 1.5-2.6zm7.6 0l1.5 2.6-3.8 2.2-1.5-2.6 3.8-2.2z"/></symbol>
+  </svg>
   <div class="win">
     <div class="titlebar">
       <img src="/website/img/logo.svg" alt="">
@@ -23,26 +36,19 @@
       <a href="/panel/" class="mlink">Web interface</a>
       <a href="/shop.html" class="mlink">Buy server</a>
     </div>
-    <div class="toolbar">
-      <button id="btn-connect"><div class="ticon c1"></div>Connect</button>
-      <button id="btn-disconnect"><div class="ticon c2"></div>Cancel</button>
-      <button data-tab="search"><div class="ticon c3"></div>Search</button>
-      <button data-tab="transfer"><div class="ticon c4"></div>Transfer</button>
-      <button data-tab="shared"><div class="ticon c5"></div>Shared</button>
-      <button data-tab="messages"><div class="ticon c6"></div>Messages</button>
-      <button data-tab="stats"><div class="ticon c7"></div>Statistics</button>
-      <button data-tab="prefs"><div class="ticon c8"></div>Options</button>
-    </div>
-    <div class="tabs" id="tabs">
-      <button data-tab="servers">Servers</button>
-      <button data-tab="search">Search</button>
-      <button data-tab="transfer" class="on">Transfer</button>
-      <button data-tab="shared">Shared Files</button>
-      <button data-tab="messages">Messages</button>
-      <button data-tab="irc">IRC</button>
-      <button data-tab="stats">Statistics</button>
-      <button data-tab="kad">Kad</button>
-      <button data-tab="prefs">Preferences</button>
+    <div class="toolbar" id="toolbar">
+      <button id="btn-connect" class="tb-action" title="Connect"><svg class="tb-ico" viewBox="0 0 24 24"><use href="#ico-connect"/></svg></button>
+      <button id="btn-disconnect" class="tb-action" title="Disconnect"><svg class="tb-ico" viewBox="0 0 24 24"><use href="#ico-disconnect"/></svg></button>
+      <span class="tb-sep"></span>
+      <button data-tab="servers" class="tb-nav" title="Servers"><svg class="tb-ico" viewBox="0 0 24 24"><use href="#ico-servers"/></svg></button>
+      <button data-tab="search" class="tb-nav" title="Search"><svg class="tb-ico" viewBox="0 0 24 24"><use href="#ico-search"/></svg></button>
+      <button data-tab="transfer" class="tb-nav on" title="Transfer"><svg class="tb-ico" viewBox="0 0 24 24"><use href="#ico-transfer"/></svg></button>
+      <button data-tab="shared" class="tb-nav" title="Shared Files"><svg class="tb-ico" viewBox="0 0 24 24"><use href="#ico-shared"/></svg></button>
+      <button data-tab="messages" class="tb-nav" title="Messages"><svg class="tb-ico" viewBox="0 0 24 24"><use href="#ico-messages"/></svg></button>
+      <button data-tab="irc" class="tb-nav" title="IRC"><svg class="tb-ico" viewBox="0 0 24 24"><use href="#ico-irc"/></svg></button>
+      <button data-tab="stats" class="tb-nav" title="Statistics"><svg class="tb-ico" viewBox="0 0 24 24"><use href="#ico-stats"/></svg></button>
+      <button data-tab="kad" class="tb-nav" title="Kad"><svg class="tb-ico" viewBox="0 0 24 24"><use href="#ico-kad"/></svg></button>
+      <button data-tab="prefs" class="tb-nav" title="Preferences"><svg class="tb-ico" viewBox="0 0 24 24"><use href="#ico-prefs"/></svg></button>
     </div>
     <div class="workspace">
       <section id="view-servers" class="view">
@@ -125,7 +131,7 @@
       </section>
 
       <section id="view-irc" class="view">
-        <p class="hint">IRC client — #vmule. This is a local echo room for the demo client.</p>
+        <p class="hint">IRC client — #vmule</p>
         <div id="irc-log" class="logbox"></div>
         <div class="formrow">
           <input id="irc-text" size="60" placeholder="Message #vmule">

@@ -127,6 +127,13 @@ function createInitialState() {
     messages: [
       { id: uuid(), from: "System", text: "Welcome to vMule. Share only files you have the right to distribute.", time: new Date().toISOString() },
     ],
+    irc: {
+      channel: "#vmule",
+      connected: true,
+      messages: [
+        { id: uuid(), from: "bot", text: "Welcome to #vmule — share legally, stay High ID.", time: new Date().toISOString() },
+      ],
+    },
     logs: [
       `[${stamp()}] vMule 0.50a started`,
       `[${stamp()}] Loading server.met ... 4 servers`,
@@ -232,6 +239,7 @@ function publicState(state) {
       ...state.search,
       results: state.search.results.map(decorateFile),
     },
+    irc: state.irc || { channel: "#vmule", connected: false, messages: [] },
     currentDown: state.currentDown || 0,
     currentUp: state.currentUp || 0,
   };

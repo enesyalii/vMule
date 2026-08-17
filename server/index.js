@@ -5,6 +5,7 @@ const cors = require("cors");
 const { v4: uuid } = require("uuid");
 const { Stripe } = require("stripe");
 const store = require("./store");
+const { loadState, saveState } = require("./persist");
 const { PLANS, createCheckoutSession } = require("./stripe");
 const {
   createInitialState,
@@ -46,10 +47,15 @@ app.post(
 app.use(express.json({ limit: "2mb" }));
 app.use(express.urlencoded({ extended: true }));
 
-let state = createInitialState();
+let state = loadState(createInitialState);
 const purchases = store.readJson("purchases.json", []);
 state.purchases = purchases;
 applyPurchasesToServers(state, purchases);
+
+function reply(res) {
+  saveState(state);
+  res.json(publicState(state));
+}
 
 setInterval(() => {
   tick(state);
@@ -153,7 +159,7 @@ app.post("/api/connect", (_req, res) => {
   state.ed2k.id = "High ID";
   if (!state.ed2k.serverId && state.servers[0]) state.ed2k.serverId = state.servers[0].id;
   state.logs.unshift(`[${stamp()}] Connecting... High ID`);
-  res.json(publicState(state));
+  reply(res);
 });
 
 app.post("/api/disconnect", (_req, res) => {
@@ -161,20 +167,20 @@ app.post("/api/disconnect", (_req, res) => {
   state.ed2k.connected = false;
   state.ed2k.id = "Disconnected";
   state.logs.unshift(`[${stamp()}] Disconnected from ED2K`);
-  res.json(publicState(state));
+  reply(res);
 });
 
 app.post("/api/kad/start", (_req, res) => {
   state.kad.connected = true;
   state.kad.firewalled = false;
   state.logs.unshift(`[${stamp()}] Kad started (bootstrap from nodes.dat)`);
-  res.json(publicState(state));
+  reply(res);
 });
 
 app.post("/api/kad/stop", (_req, res) => {
   state.kad.connected = false;
   state.logs.unshift(`[${stamp()}] Kad stopped`);
-  res.json(publicState(state));
+  reply(res);
 });
 
 app.post("/api/downloads/:id/:cmd", (req, res) => {
@@ -186,15 +192,15 @@ app.post("/api/downloads/:id/:cmd", (req, res) => {
   else if (cmd === "cancel") {
     state.downloads = state.downloads.filter((x) => x.id !== d.id);
     state.logs.unshift(`[${stamp()}] Cancelled ${d.name}`);
-    return res.json(publicState(state));
+    return reply(res);
   } else if (cmd === "prioup") d.prio = d.prio === "Low" ? "Normal" : "High";
   else if (cmd === "priodown") d.prio = d.prio === "High" ? "Normal" : "Low";
-  res.json(publicState(state));
+  reply(res);
 });
 
 app.post("/api/search", (req, res) => {
   runSearch(state, req.body || {});
-  res.json(publicState(state));
+  reply(res);
 });
 
 app.post("/api/search/download", (req, res) => {
@@ -202,7 +208,7 @@ app.post("/api/search/download", (req, res) => {
   const found = state.search.results.find((r) => r.hash === hash);
   if (!found) return res.status(404).json({ error: "result not found" });
   if (state.downloads.some((d) => d.hash === hash)) {
-    return res.json(publicState(state));
+    return reply(res);
   }
   state.downloads.unshift({
     ...found,
@@ -211,7 +217,7 @@ app.post("/api/search/download", (req, res) => {
     complete: false,
   });
   state.logs.unshift(`[${stamp()}] Added to download: ${found.name}`);
-  res.json(publicState(state));
+  reply(res);
 });
 
 app.post("/api/ed2k", (req, res) => {
@@ -230,7 +236,7 @@ app.post("/api/ed2k", (req, res) => {
   item.status = "downloading";
   state.downloads.unshift(item);
   state.logs.unshift(`[${stamp()}] ed2k link added: ${item.name}`);
-  res.json(publicState(state));
+  reply(res);
 });
 
 app.post("/api/servers", (req, res) => {
@@ -249,7 +255,7 @@ app.post("/api/servers", (req, res) => {
     static: false,
     premium: false,
   });
-  res.json(publicState(state));
+  reply(res);
 });
 
 app.post("/api/servers/:id/connect", (req, res) => {
@@ -260,17 +266,17 @@ app.post("/api/servers/:id/connect", (req, res) => {
   state.ed2k.serverId = srv.id;
   state.ed2k.id = "High ID";
   state.logs.unshift(`[${stamp()}] Connected to ${srv.name} (${srv.ip}:${srv.port})`);
-  res.json(publicState(state));
+  reply(res);
 });
 
 app.post("/api/servers/:id/remove", (req, res) => {
   state.servers = state.servers.filter((s) => s.id !== req.params.id);
-  res.json(publicState(state));
+  reply(res);
 });
 
 app.post("/api/shared/reload", (_req, res) => {
   state.logs.unshift(`[${stamp()}] Reloaded shared files`);
-  res.json(publicState(state));
+  reply(res);
 });
 
 app.get("/api/logs", (req, res) => {
@@ -282,7 +288,7 @@ app.put("/api/settings", (req, res) => {
   state.settings = { ...state.settings, ...(req.body || {}) };
   state.nickname = state.settings.nickname || state.nickname;
   state.logs.unshift(`[${stamp()}] Preferences saved`);
-  res.json(publicState(state));
+  reply(res);
 });
 
 app.post("/api/messages", (req, res) => {
@@ -294,7 +300,39 @@ app.post("/api/messages", (req, res) => {
     text,
     time: new Date().toISOString(),
   });
-  res.json(publicState(state));
+  reply(res);
+});
+
+app.get("/api/irc", (_req, res) => {
+  res.json(state.irc || { channel: "#vmule", connected: false, messages: [] });
+});
+
+app.post("/api/irc", (req, res) => {
+  const text = String((req.body && req.body.text) || "").trim();
+  if (!text) return res.status(400).json({ error: "empty" });
+  if (!state.irc) {
+    state.irc = { channel: "#vmule", connected: true, messages: [] };
+  }
+  state.irc.connected = true;
+  state.irc.messages.push({
+    id: uuid(),
+    from: state.nickname,
+    text,
+    time: new Date().toISOString(),
+  });
+  const replies = [
+    "Share only files you have the right to distribute.",
+    "Kad is up — try searching on the Kad network.",
+    "High ID is better for uploads. Check your ports in Preferences.",
+  ];
+  state.irc.messages.push({
+    id: uuid(),
+    from: "bot",
+    text: replies[Math.floor(Math.random() * replies.length)],
+    time: new Date().toISOString(),
+  });
+  if (state.irc.messages.length > 200) state.irc.messages.length = 200;
+  reply(res);
 });
 
 app.post("/api/panel/login", (req, res) => {

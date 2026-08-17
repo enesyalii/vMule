@@ -23,11 +23,11 @@ async function api(path, opts = {}) {
 
 function showTab(name) {
   $$(".view").forEach((v) => v.classList.toggle("on", v.id === `view-${name}`));
-  $$("#tabs button").forEach((b) => b.classList.toggle("on", b.dataset.tab === name));
+  $$(".toolbar button.tb-nav").forEach((b) => b.classList.toggle("on", b.dataset.tab === name));
 }
 
 function bindTabs() {
-  $$("#tabs button, .toolbar button[data-tab]").forEach((b) => {
+  $$(".toolbar button.tb-nav").forEach((b) => {
     b.onclick = () => showTab(b.dataset.tab);
   });
 }
@@ -139,6 +139,12 @@ function render() {
     .map((m) => `[${new Date(m.time).toLocaleTimeString()}] <${m.from}> ${m.text}`)
     .join("\n");
 
+  if (state.irc && state.irc.messages) {
+    $("#irc-log").textContent = state.irc.messages
+      .map((m) => `[${new Date(m.time).toLocaleTimeString()}] <${m.from}> ${m.text}`)
+      .join("\n");
+  }
+
   $("#kad-info").textContent = JSON.stringify(state.kad, null, 2);
   $("#stats-text").textContent =
     `Session DL: ${fmt(state.stats.sessionDown)}\nSession UL: ${fmt(state.stats.sessionUp)}\n` +
@@ -236,7 +242,8 @@ $("#msg-send").onclick = () => {
 };
 $("#irc-send").onclick = () => {
   const t = $("#irc-text").value;
-  $("#irc-log").textContent += `\n<you> ${t}\n<bot> motd: share legally, stay High ID.`;
+  if (!t.trim()) return;
+  cmd("/api/irc", { text: t });
   $("#irc-text").value = "";
 };
 $("#set-save").onclick = () =>

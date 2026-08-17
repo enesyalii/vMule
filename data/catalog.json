@@ -1,0 +1,22 @@
+[
+  { "name": "debian-12.10.0-amd64-netinst.iso", "size": 628097024, "type": "Archive", "ext": "iso", "sources": 1840 },
+  { "name": "ubuntu-24.04.2-desktop-amd64.iso", "size": 5813305344, "type": "Archive", "ext": "iso", "sources": 3211 },
+  { "name": "fedora-workstation-41-x86_64.iso", "size": 2306867200, "type": "Archive", "ext": "iso", "sources": 902 },
+  { "name": "linux-6.12.8.tar.xz", "size": 148576256, "type": "Archive", "ext": "xz", "sources": 540 },
+  { "name": "ProjectGutenberg-SherlockHolmes.epub", "size": 612352, "type": "Document", "ext": "epub", "sources": 88 },
+  { "name": "ProjectGutenberg-PrideAndPrejudice.epub", "size": 445440, "type": "Document", "ext": "epub", "sources": 76 },
+  { "name": "OpenStreetMap-planet-excerpt.pbf", "size": 89128960, "type": "Document", "ext": "pbf", "sources": 41 },
+  { "name": "Blender-4.3.2-windows-x64.msi", "size": 326107136, "type": "Program", "ext": "msi", "sources": 612 },
+  { "name": "GIMP-2.10.38-setup.exe", "size": 298844160, "type": "Program", "ext": "exe", "sources": 701 },
+  { "name": "VLC-3.0.21-win64.exe", "size": 44564480, "type": "Program", "ext": "exe", "sources": 1550 },
+  { "name": "LibreOffice_24.8_Win_x86-64.msi", "size": 355467264, "type": "Program", "ext": "msi", "sources": 430 },
+  { "name": "CC-0_Piano_Etude_No3.flac", "size": 42844160, "type": "Audio", "ext": "flac", "sources": 22 },
+  { "name": "NASA-Apollo11-Onboard-Audio.flac", "size": 891289600, "type": "Audio", "ext": "flac", "sources": 19 },
+  { "name": "Sintel-2010-1080p-CC-BY.mkv", "size": 1291845632, "type": "Video", "ext": "mkv", "sources": 260 },
+  { "name": "TearsOfSteel-2012-1080p-CC-BY.mkv", "size": 734003200, "type": "Video", "ext": "mkv", "sources": 188 },
+  { "name": "BigBuckBunny-2008-1080p-CC-BY.mp4", "size": 276824064, "type": "Video", "ext": "mp4", "sources": 940 },
+  { "name": "Wikipedia-en-dump-excerpt.xml.bz2", "size": 157286400, "type": "Document", "ext": "bz2", "sources": 55 },
+  { "name": "Python-3.13.1.tgz", "size": 29360128, "type": "Archive", "ext": "tgz", "sources": 210 },
+  { "name": "nodejs-22.13.0-x64.msi", "size": 30408704, "type": "Program", "ext": "msi", "sources": 133 },
+  { "name": "Wireshark-4.4.3-x64.exe", "size": 90177536, "type": "Program", "ext": "exe", "sources": 97 }
+]

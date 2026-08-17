@@ -1,7 +1,7 @@
 {
   "name": "vmule",
-  "version": "0.50.0",
-  "description": "vMule — eMule-like P2P client, website, control panel, and Stripe server shop",
+  "version": "0.51.0",
+  "description": "vMule — eMule-like P2P client, website, and Stripe server shop",
   "main": "electron/main.js",
   "author": "vMule",
   "license": "GPL-2.0-or-later",
@@ -38,6 +38,8 @@
       "server/**/*",
       "public/**/*",
       "data/updates.json",
+      "data/catalog.json",
+      "data/servers.json",
       "package.json"
     ],
     "win": {

@@ -4,7 +4,7 @@
     "version": "0.50a",
     "channel": "stable",
     "title": "vMule 0.50a released",
-    "changelog": "Official stable release. Improved Kad bootstrap, obfuscation, credit system, and remote control panel. Installer includes all language files.",
+    "changelog": "Official stable release. Improved Kad bootstrap, obfuscation, and credit system. Installer includes all language files.",
     "download_url": "https://github.com/enesyalii/vMule/releases/latest/download/vMule-Setup-0.50.0.exe",
     "filename": "vMule-Setup-0.50.0.exe",
     "size": "4.8 MB",

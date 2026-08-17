@@ -1,6 +1,6 @@
 # vMule
 
-Windows P2P client in the eMule tradition, plus a project website, an aMule-style remote panel, Stripe server checkout, and a separate Python release admin.
+Windows P2P client in the eMule tradition, plus a project website, Stripe server checkout, and a separate Python release admin.
 
 Share only files you have the right to distribute. The demo catalog is public-domain, open-source, and Creative Commons material.
 
@@ -29,7 +29,6 @@ start-admin.bat
 | --- | --- |
 | Website | http://localhost:4242/ |
 | Client | http://localhost:4242/client/ |
-| Control panel | http://localhost:4242/panel/ |
 | Shop | http://localhost:4242/shop.html |
 | Update admin | http://127.0.0.1:5050/ |
 
@@ -52,10 +51,9 @@ Without keys, the shop runs in demo mode.
 
 ```
 electron/        Desktop shell
-server/          Node API
+server/          Node API (VmuleEngine, VMLF TCP, REST + SSE)
 public/website/  Project site
 public/client/   Client UI
-public/panel/    Remote control UI
 admin/           Python update admin
 data/            Published updates
 ```

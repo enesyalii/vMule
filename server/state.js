@@ -128,6 +128,7 @@ function createInitialState() {
       webEnabled: true,
       webPort: 4711,
       obfuscation: true,
+      skin: "polar",
     },
     stats: {
       downTotal: 42_991_000_000,

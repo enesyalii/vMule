@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <title>vMule</title>
   <link rel="stylesheet" href="css/client.css">
+  <link rel="stylesheet" href="css/skins.css">
   <link rel="icon" href="/website/img/logo.svg">
 </head>
 <body>
@@ -22,7 +23,7 @@
     <symbol id="ico-logs" viewBox="0 0 24 24"><path fill="currentColor" d="M4 4h16v2H4V4zm0 4h16v2H4V8zm0 4h10v2H4v-2zm0 4h14v2H4v-2z"/></symbol>
   </svg>
 
-  <div class="win">
+  <div class="win" data-skin="polar">
     <div class="titlebar">
       <img src="/website/img/logo.svg" alt="">
       <span id="win-title">vMule v0.51a</span>
@@ -226,6 +227,16 @@
         <div class="prefs">
           <fieldset><legend>General</legend>
             <label>Nickname <input id="set-nick"></label>
+          </fieldset>
+          <fieldset><legend>Display</legend>
+            <label>Skin profile
+              <select id="set-skin">
+                <option value="classic">Default Classic</option>
+                <option value="luna">XP Luna</option>
+                <option value="polar">POLAR</option>
+              </select>
+            </label>
+            <p class="hint">POLAR — icy blue title bar and cool list colors. Skins live in <code>skins/</code> (INI + icons).</p>
           </fieldset>
           <fieldset><legend>Connection (VMLF)</legend>
             <label>Max download KB/s (0 = unlimited) <input id="set-down" type="number" min="0"></label>

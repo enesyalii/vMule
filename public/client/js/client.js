@@ -43,6 +43,29 @@ const TAB_KEYS = {
   "5": "messages", "6": "irc", "7": "stats", "8": "kad", "9": "logs", "0": "prefs",
 };
 
+const SKINS = ["classic", "luna", "polar"];
+
+function applySkin(name) {
+  const skin = SKINS.includes(name) ? name : "polar";
+  const win = document.querySelector(".win");
+  if (win) win.dataset.skin = skin;
+  try {
+    localStorage.setItem("vmule-skin", skin);
+  } catch {
+    /* ignore */
+  }
+}
+
+function bootSkin() {
+  try {
+    const cached = localStorage.getItem("vmule-skin");
+    if (cached && SKINS.includes(cached)) applySkin(cached);
+  } catch {
+    /* ignore */
+  }
+}
+bootSkin();
+
 function fmt(n) {
   if (n < 1024) return `${Math.round(n)} B`;
   const u = ["KB", "MB", "GB", "TB"];
@@ -329,6 +352,7 @@ function render() {
 
   drawSpeed();
   fillPrefs();
+  applySkin(state.settings?.skin || "polar");
   scrollLogs();
 }
 
@@ -342,6 +366,8 @@ function fillPrefs() {
   $("#set-udp").value = s.udpPort;
   $("#set-conn").value = s.maxConnections;
   $("#set-obf").checked = s.obfuscation;
+  const skin = SKINS.includes(s.skin) ? s.skin : "polar";
+  $("#set-skin").value = skin;
 }
 
 function drawSpeed() {
@@ -506,6 +532,7 @@ $("#irc-send").onclick = () => {
   $("#irc-text").value = "";
 };
 $("#irc-text").addEventListener("keydown", (e) => { if (e.key === "Enter") $("#irc-send").click(); });
+$("#set-skin").onchange = () => applySkin($("#set-skin").value);
 $("#set-save").onclick = () =>
   api("/api/settings", {
     method: "PUT",
@@ -517,6 +544,7 @@ $("#set-save").onclick = () =>
       udpPort: Number($("#set-udp").value),
       maxConnections: Number($("#set-conn").value),
       obfuscation: $("#set-obf").checked,
+      skin: $("#set-skin").value,
     },
   }).then((s) => {
     state = s;

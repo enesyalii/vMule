@@ -1,0 +1,107 @@
+/* Skin profiles — switch via .win[data-skin] (Preferences → Display) */
+
+.win[data-skin="classic"] {
+  --vm-chrome: #d4d0c8;
+  --vm-chrome-dark: #c0bcb4;
+  --vm-chrome-light: #ece9d8;
+  --vm-surface: #fff;
+  --vm-surface-alt: #f7f5f0;
+  --vm-border: #808080;
+  --vm-win-border: #404040;
+  --vm-accent: #000080;
+  --vm-accent-text: #fff;
+  --vm-link: #000080;
+  --vm-titlebar: linear-gradient(180deg, #808080 0%, #c0c0c0 8%, #808080 50%, #606060 100%);
+  --vm-body-bg: #808080;
+  --vm-hint-bg: #f7f5f0;
+  --vm-stats-bg: #001028;
+  --vm-down-color: #000080;
+  --vm-done-color: #006600;
+}
+
+.win[data-skin="luna"],
+.win:not([data-skin]) {
+  --vm-chrome: #d4d0c8;
+  --vm-chrome-dark: #d4d0c8;
+  --vm-chrome-light: #ece9d8;
+  --vm-surface: #fff;
+  --vm-surface-alt: #f7f5f0;
+  --vm-border: #808080;
+  --vm-win-border: #0a246a;
+  --vm-accent: #0a246a;
+  --vm-accent-text: #fff;
+  --vm-link: #003399;
+  --vm-titlebar: linear-gradient(180deg, #0a246a 0%, #3a6ea5 8%, #0a246a 50%, #082058 100%);
+  --vm-body-bg: #3d4a73;
+  --vm-hint-bg: #f7f5f0;
+  --vm-stats-bg: #001028;
+  --vm-down-color: #003399;
+  --vm-done-color: #006600;
+}
+
+.win[data-skin="polar"] {
+  --vm-chrome: #d8eaf4;
+  --vm-chrome-dark: #c8e0ec;
+  --vm-chrome-light: #eef6fb;
+  --vm-surface: #f8fcff;
+  --vm-surface-alt: #e8f4fc;
+  --vm-border: #7eb8d4;
+  --vm-win-border: #004d66;
+  --vm-accent: #006688;
+  --vm-accent-text: #fff;
+  --vm-link: #005a7a;
+  --vm-titlebar: linear-gradient(180deg, #003d52 0%, #2a9fd4 12%, #006688 48%, #002a38 100%);
+  --vm-body-bg: #1a3a4a;
+  --vm-hint-bg: #e0f2fa;
+  --vm-stats-bg: #002233;
+  --vm-down-color: #005a8a;
+  --vm-done-color: #1a7a4a;
+}
+
+html, body { background: var(--vm-body-bg, #3d4a73); }
+a { color: var(--vm-link, #003399); }
+.win {
+  background: var(--vm-chrome, #d4d0c8);
+  border-color: var(--vm-win-border, #0a246a);
+}
+.titlebar {
+  background: var(--vm-titlebar);
+  color: var(--vm-accent-text, #fff);
+}
+.menu-item:hover, .menu-item.open,
+.menu-popup button:hover,
+.ctx-menu button:hover,
+.mlink:hover {
+  background: var(--vm-accent, #0a246a);
+  color: var(--vm-accent-text, #fff);
+}
+.menubar, .toolbar, .formrow, .split-bar, .console-head, .statusbar,
+.console-head button, .formrow button, .prefs button {
+  background: var(--vm-chrome, #d4d0c8);
+}
+.pane-label, .lv th {
+  background: linear-gradient(180deg, var(--vm-chrome-light, #ece9d8), var(--vm-chrome, #d4d0c8));
+}
+.lv tbody tr:nth-child(even) td { background: var(--vm-surface-alt, #f7f5f0); }
+.lv tr.sel td {
+  background: var(--vm-accent, #0a246a) !important;
+  color: var(--vm-accent-text, #fff) !important;
+}
+.lv tr.down td { color: var(--vm-down-color, #003399); }
+.lv tr.done td { color: var(--vm-done-color, #006600); }
+.workspace, .console, .console-body, .logbox { background: var(--vm-surface, #fff); }
+.hint { background: var(--vm-hint-bg, #f7f5f0); }
+fieldset { background: var(--vm-surface-alt, #f7f5f0); }
+.statsgrid canvas { background: var(--vm-stats-bg, #001028); }
+.transfer-up { border-top-color: var(--vm-border, #808080); }
+
+.win[data-skin="polar"] .tb-action .tb-ico-wrap {
+  background: linear-gradient(180deg, #7dd4e8, #2a8aaa);
+}
+.win[data-skin="polar"] .tb-nav .tb-ico-wrap {
+  background: linear-gradient(180deg, #f0fafc, #b8dce8);
+}
+.win[data-skin="polar"] .sb-led.on {
+  background: #2ec4e8;
+  box-shadow: 0 0 4px #2ec4e8;
+}

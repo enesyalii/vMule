@@ -1,7 +1,7 @@
 {
   "name": "vmule",
-  "version": "0.50.0",
-  "description": "vMule — eMule-like P2P client, website, control panel, and Stripe server shop",
+  "version": "0.51.0",
+  "description": "vMule — eMule-like P2P client, website, and Stripe server shop",
   "main": "electron/main.js",
   "author": "vMule",
   "license": "GPL-2.0-or-later",
@@ -15,6 +15,7 @@
     "node": ">=18"
   },
   "dependencies": {
+    "@polar-sh/sdk": "^0.49.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
@@ -38,11 +39,15 @@
       "server/**/*",
       "public/**/*",
       "data/updates.json",
+      "data/catalog.json",
+      "data/servers.json",
       "package.json"
     ],
     "win": {
       "icon": "build/icon.png",
-      "target": ["nsis"]
+      "target": [
+        "nsis"
+      ]
     },
     "nsis": {
       "oneClick": false,

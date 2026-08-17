@@ -1,0 +1,226 @@
+const express = require("express");
+const { v4: uuid } = require("uuid");
+const store = require("../store");
+const { PLANS } = require("../plans");
+const { createCheckoutSession } = require("../stripe");
+const { createPolarCheckout } = require("../polar");
+const config = require("../config");
+
+function createClientRoutes(engine, stripe, polar) {
+  const router = express.Router();
+
+  router.get("/health", (_req, res) => {
+    res.json({
+      ok: true,
+      name: "vMule",
+      version: "0.51.0",
+      protocol: "VMLF",
+      stripe: Boolean(stripe),
+      polar: Boolean(polar),
+      serverless: config.isServerless,
+      tcp: config.VMLF_TCP_ENABLED ? config.VMLF_TCP_PORT : null,
+    });
+  });
+
+  router.get("/updates", (_req, res) => {
+    res.json(store.readJson("updates.json", []).filter((u) => u.published));
+  });
+
+  router.get("/catalog", (_req, res) => {
+    res.json({ items: engine.getCatalog() });
+  });
+
+  router.get("/state", (_req, res) => {
+    res.json(engine.snapshot());
+  });
+
+  router.get("/events", (req, res) => {
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+    res.flushHeaders?.();
+
+    const push = (snap) => {
+      res.write(`data: ${JSON.stringify(snap)}\n\n`);
+    };
+    push(engine.snapshot());
+    engine.on("update", push);
+    req.on("close", () => engine.off("update", push));
+  });
+
+  router.post("/connect", (_req, res) => res.json(engine.connect()));
+  router.post("/disconnect", (_req, res) => res.json(engine.disconnect()));
+  router.post("/kad/start", (_req, res) => res.json(engine.kadStart()));
+  router.post("/kad/stop", (_req, res) => res.json(engine.kadStop()));
+
+  router.post("/downloads/:id/:cmd", (req, res) => {
+    const st = engine.downloadCmd(req.params.id, req.params.cmd);
+    if (!st) return res.status(404).json({ error: "not found" });
+    res.json(st);
+  });
+
+  router.post("/search", (req, res) => res.json(engine.search(req.body)));
+  router.post("/search/download", (req, res) => {
+    const hash = req.body?.hash;
+    const st = engine.searchDownload(hash);
+    if (!st) return res.status(404).json({ error: "result not found" });
+    res.json(st);
+  });
+
+  const addLink = (req, res) => {
+    const result = engine.addVmlfLink(req.body?.link);
+    if (result.error) return res.status(400).json({ error: result.error });
+    res.json(result.state);
+  };
+  router.post("/vmlf", addLink);
+  router.post("/ed2k", addLink);
+
+  router.post("/servers", (req, res) => {
+    const result = engine.addServer(req.body || {});
+    if (result?.error) return res.status(400).json({ error: result.error });
+    res.json(result);
+  });
+
+  router.post("/servers/:id/connect", (req, res) => {
+    const st = engine.connectServer(req.params.id);
+    if (!st) return res.status(404).json({ error: "not found" });
+    res.json(st);
+  });
+
+  router.post("/servers/:id/remove", (req, res) => {
+    res.json(engine.removeServer(req.params.id));
+  });
+
+  router.post("/shared/reload", (_req, res) => res.json(engine.reloadShared()));
+
+  router.get("/logs", (req, res) => {
+    if (req.query.reset === "1") engine.resetLogs();
+    res.json({ logs: engine.getLogs() });
+  });
+
+  router.put("/settings", (req, res) => res.json(engine.updateSettings(req.body)));
+
+  router.post("/messages", (req, res) => {
+    const text = String(req.body?.text || "").trim();
+    const result = engine.addMessage(text);
+    if (result?.error) return res.status(400).json({ error: result.error });
+    res.json(result);
+  });
+
+  router.get("/irc", (_req, res) => res.json(engine.getIrc()));
+
+  router.post("/irc", (req, res) => {
+    const text = String(req.body?.text || "").trim();
+    const result = engine.addIrcMessage(text);
+    if (result?.error) return res.status(400).json({ error: result.error });
+    res.json(result);
+  });
+
+  return router;
+}
+
+function demoCheckout(engine, plan) {
+  const demo = {
+    id: `demo_${uuid()}`,
+    planId: plan.id,
+    planName: plan.name,
+    amount: plan.amount,
+    currency: plan.currency,
+    customerEmail: "demo@vmule.local",
+    mode: plan.mode,
+    provider: "demo",
+    paidAt: new Date().toISOString(),
+    demo: true,
+  };
+  engine.fulfillPurchase(demo);
+  return {
+    demo: true,
+    url: `${config.BASE_URL}/shop-success.html?session_id=${demo.id}&demo=1`,
+    id: demo.id,
+  };
+}
+
+function createShopRoutes(engine, stripe, polar) {
+  const router = express.Router();
+
+  router.get("/plans", (_req, res) => {
+    res.json({
+      plans: PLANS,
+      stripeConfigured: Boolean(stripe),
+      polarConfigured: Boolean(polar),
+      purchases: engine.purchases.filter((p) => p.status === "paid"),
+    });
+  });
+
+  router.post("/checkout", async (req, res) => {
+    const planId = req.body?.planId;
+    const provider = String(req.body?.provider || "stripe").toLowerCase();
+    const plan = PLANS[planId];
+    if (!plan) return res.status(400).json({ error: "Unknown plan" });
+
+    if (provider === "polar") {
+      if (!polar) return res.json(demoCheckout(engine, plan));
+      try {
+        const session = await createPolarCheckout(polar, plan, config.BASE_URL);
+        return res.json({ url: session.url, id: session.id, provider: "polar" });
+      } catch (err) {
+        return res.status(500).json({ error: err.message || "Polar error" });
+      }
+    }
+
+    if (!stripe) return res.json(demoCheckout(engine, plan));
+
+    try {
+      const session = await createCheckoutSession(stripe, plan, config.BASE_URL);
+      res.json({ url: session.url, id: session.id, provider: "stripe" });
+    } catch (err) {
+      res.status(500).json({ error: err.message || "Stripe error" });
+    }
+  });
+
+  router.get("/checkout/session/:id", async (req, res) => {
+    const id = req.params.id;
+    const local = engine.purchases.find((p) => p.id === id);
+    if (local) return res.json(local);
+
+    const provider = String(req.query.provider || "").toLowerCase();
+
+    if (provider === "polar" && polar) {
+      try {
+        const checkout = await polar.checkouts.get({ id });
+        const planId = checkout.metadata?.plan_id;
+        const plan = PLANS[planId];
+        return res.json({
+          id: checkout.id,
+          status: checkout.status === "succeeded" ? "paid" : checkout.status,
+          planId,
+          planName: plan?.name,
+          amount: checkout.totalAmount,
+          currency: checkout.currency,
+          provider: "polar",
+        });
+      } catch (err) {
+        return res.status(404).json({ error: err.message });
+      }
+    }
+
+    if (!stripe) return res.status(404).json({ error: "not found" });
+    try {
+      const session = await stripe.checkout.sessions.retrieve(id);
+      res.json({
+        id: session.id,
+        status: session.payment_status,
+        amount: session.amount_total,
+        currency: session.currency,
+        planId: session.metadata?.plan_id,
+        provider: "stripe",
+      });
+    } catch (err) {
+      res.status(404).json({ error: err.message });
+    }
+  });
+
+  return router;
+}
+
+module.exports = { createClientRoutes, createShopRoutes };

@@ -13,15 +13,19 @@ document.write(vmuleChrome(`
   <h2>Thank you</h2>
   <p>Your vMule server purchase completed. The node is now in the client server list.</p>
   <p id="detail" class="muted">Loading session...</p>
-  <p><a class="btn" href="/client/">Open client</a> <a class="btn" href="/panel/">Open control panel</a> <a class="btn" href="shop.html">Back to shop</a></p>
+  <p><a class="btn" href="/client/">Open client</a> <a class="btn" href="shop.html">Back to shop</a></p>
 `));
 vmuleReady();
 const params = new URLSearchParams(location.search);
-const id = params.get("session_id");
+const id = params.get("session_id") || params.get("checkout_id");
+const provider = params.get("provider") || (params.get("checkout_id") ? "polar" : "stripe");
 if (id) {
-  fetch("/api/checkout/session/" + encodeURIComponent(id)).then(r => r.json()).then(s => {
+  const q = new URLSearchParams({ provider });
+  fetch("/api/checkout/session/" + encodeURIComponent(id) + "?" + q.toString()).then(r => r.json()).then(s => {
     document.getElementById("detail").textContent =
-      (s.planName || s.planId || "Server") + " · " + (s.status || "paid") + (s.demo ? " · demo checkout" : "");
+      (s.planName || s.planId || "Server") + " · " + (s.status || "paid") +
+      (s.demo ? " · demo checkout" : "") +
+      (s.provider ? " · " + s.provider : "");
   }).catch(() => {
     document.getElementById("detail").textContent = "Session " + id;
   });

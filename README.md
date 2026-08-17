@@ -1,6 +1,6 @@
 # vMule
 
-Windows P2P client in the eMule tradition, plus a project website, an aMule-style remote panel, Stripe server checkout, and a separate Python release admin.
+Windows P2P client in the eMule tradition, plus a project website, Stripe server checkout, and a separate Python release admin.
 
 Share only files you have the right to distribute. The demo catalog is public-domain, open-source, and Creative Commons material.
 
@@ -29,7 +29,6 @@ start-admin.bat
 | --- | --- |
 | Website | http://localhost:4242/ |
 | Client | http://localhost:4242/client/ |
-| Control panel | http://localhost:4242/panel/ |
 | Shop | http://localhost:4242/shop.html |
 | Update admin | http://127.0.0.1:5050/ |
 
@@ -40,22 +39,26 @@ npm install
 npm run build:win
 ```
 
-Output: `dist/vMule-Setup-0.50.0.exe`
+Output: `dist/vMule-Setup-0.51.0.exe`
 
 ## Stripe
 
 Put a [restricted API key](https://docs.stripe.com/keys/restricted-api-keys) in `STRIPE_SECRET_KEY`. Checkout uses Stripe Checkout Sessions. Webhook: `POST /api/stripe/webhook`.
 
-Without keys, the shop runs in demo mode.
+## Polar
+
+Organization access token in `POLAR_ACCESS_TOKEN`. Map products with `POLAR_PRODUCT_STARTER` and `POLAR_PRODUCT_PRO`. Webhook: `POST /api/polar/webhook` (subscribe to `order.paid`). Set `POLAR_SANDBOX=1` for sandbox API.
+
+Without payment keys, the shop runs in demo mode.
+
 
 ## Layout
 
 ```
 electron/        Desktop shell
-server/          Node API
+server/          Node API (VmuleEngine, VMLF TCP, REST + SSE)
 public/website/  Project site
 public/client/   Client UI
-public/panel/    Remote control UI
 admin/           Python update admin
 data/            Published updates
 ```

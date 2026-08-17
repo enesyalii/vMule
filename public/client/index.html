@@ -4,48 +4,102 @@
   <meta charset="utf-8">
   <title>vMule</title>
   <link rel="stylesheet" href="css/client.css">
+  <link rel="stylesheet" href="css/skins.css">
   <link rel="icon" href="/website/img/logo.svg">
 </head>
 <body>
-  <div class="win">
+  <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display:none">
+    <symbol id="ico-connect" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a5 5 0 0 0-5 5v2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-9a2 2 0 0 0-2-2h-2V7a5 5 0 0 0-5-5zm-3 7V7a3 3 0 1 1 6 0v2H9z"/></symbol>
+    <symbol id="ico-disconnect" viewBox="0 0 24 24"><path fill="currentColor" d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="3" fill="none"/></symbol>
+    <symbol id="ico-search" viewBox="0 0 24 24"><path fill="currentColor" d="M10 2a8 8 0 1 0 4.9 14.3l4.4 4.4 1.4-1.4-4.4-4.4A8 8 0 0 0 10 2zm0 2a6 6 0 1 1 0 12 6 6 0 0 1 0-12z"/></symbol>
+    <symbol id="ico-transfer" viewBox="0 0 24 24"><path fill="currentColor" d="M12 3l-5 5h3v6h4v-6h3l-5-5zm-7 14h14v2H5v-2z"/></symbol>
+    <symbol id="ico-shared" viewBox="0 0 24 24"><path fill="currentColor" d="M4 4h8l2 2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm0 4v10h16V8H4z"/></symbol>
+    <symbol id="ico-messages" viewBox="0 0 24 24"><path fill="currentColor" d="M4 4h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6l-4 4V6a2 2 0 0 1 2-2zm2 4v2h12V8H6zm0 4v2h8v-2H6z"/></symbol>
+    <symbol id="ico-stats" viewBox="0 0 24 24"><path fill="currentColor" d="M4 20h2V10H4v10zm6 0h2V6H10v14zm6 0h2V14h-2v6zm6 0h2V4h-2v16z"/></symbol>
+    <symbol id="ico-prefs" viewBox="0 0 24 24"><path fill="currentColor" d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm9 4a7.9 7.9 0 0 0-.2-1.7l2-1.5-2-3.5-2.4 1a8 8 0 0 0-2.9-1.7L17.5 2h-4l-.8 2.9a8 8 0 0 0-2.9 1.7l-2.4-1-2 3.5 2 1.5a7.9 7.9 0 0 0 0 3.4l-2 1.5 2 3.5 2.4-1a8 8 0 0 0 2.9 1.7l.8 2.9h4l.8-2.9a8 8 0 0 0 2.9-1.7l2.4 1 2-3.5-2-1.5c.1-.5.2-1.1.2-1.7z"/></symbol>
+    <symbol id="ico-servers" viewBox="0 0 24 24"><path fill="currentColor" d="M4 4h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm0 10h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2zm2 2v2h2v-2H6zm4 0v2h8v-2h-8zM6 6v2h2V6H6zm4 0v2h8V6h-8z"/></symbol>
+    <symbol id="ico-irc" viewBox="0 0 24 24"><path fill="currentColor" d="M4 4h16v12H5.2L4 17.2V4zm2 2v2h12V6H6zm0 4v2h8v-2H6z"/></symbol>
+    <symbol id="ico-kad" viewBox="0 0 24 24"><circle fill="currentColor" cx="6" cy="6" r="3"/><circle fill="currentColor" cx="18" cy="6" r="3"/><circle fill="currentColor" cx="12" cy="18" r="3"/><path fill="currentColor" d="M8.2 7.8l3.8 2.2-1.5 2.6-3.8-2.2 1.5-2.6zm7.6 0l1.5 2.6-3.8 2.2-1.5-2.6 3.8-2.2z"/></symbol>
+    <symbol id="ico-logs" viewBox="0 0 24 24"><path fill="currentColor" d="M4 4h16v2H4V4zm0 4h16v2H4V8zm0 4h10v2H4v-2zm0 4h14v2H4v-2z"/></symbol>
+  </svg>
+
+  <div class="win" data-skin="polar">
     <div class="titlebar">
       <img src="/website/img/logo.svg" alt="">
-      <span id="win-title">vMule v0.50a</span>
+      <span id="win-title">vMule v0.51a</span>
       <div class="caption">
-        <button title="Minimize">_</button>
-        <button title="Maximize">□</button>
-        <button class="x" title="Close" onclick="location.href='/'">×</button>
+        <button type="button" title="Minimize">_</button>
+        <button type="button" title="Maximize">□</button>
+        <button type="button" class="x" title="Close" onclick="location.href='/'">×</button>
       </div>
     </div>
-    <div class="menubar">
-      <span>File</span><span>View</span><span>Tools</span><span>Window</span><span>Help</span>
+
+    <div class="menubar" id="menubar">
+      <span class="menu-item" data-menu="file">File</span>
+      <span class="menu-item" data-menu="view">View</span>
+      <span class="menu-item" data-menu="tools">Tools</span>
+      <span class="menu-item" data-menu="help">Help</span>
       <a href="/" class="mlink">Website</a>
-      <a href="/panel/" class="mlink">Web interface</a>
       <a href="/shop.html" class="mlink">Buy server</a>
     </div>
-    <div class="toolbar">
-      <button id="btn-connect"><div class="ticon c1"></div>Connect</button>
-      <button id="btn-disconnect"><div class="ticon c2"></div>Cancel</button>
-      <button data-tab="search"><div class="ticon c3"></div>Search</button>
-      <button data-tab="transfer"><div class="ticon c4"></div>Transfer</button>
-      <button data-tab="shared"><div class="ticon c5"></div>Shared</button>
-      <button data-tab="messages"><div class="ticon c6"></div>Messages</button>
-      <button data-tab="stats"><div class="ticon c7"></div>Statistics</button>
-      <button data-tab="prefs"><div class="ticon c8"></div>Options</button>
+    <div id="menu-popup" class="menu-popup" hidden></div>
+    <div id="ctx-menu" class="ctx-menu" hidden></div>
+
+    <div class="toolbar" id="toolbar">
+      <button type="button" id="btn-connect" class="tb-action" title="Connect to VMLF server (Ctrl+C)">
+        <span class="tb-ico-wrap"><svg class="tb-ico" viewBox="0 0 24 24"><use href="#ico-connect"/></svg></span>
+        <span class="tb-label">Connect</span>
+      </button>
+      <button type="button" id="btn-disconnect" class="tb-action" title="Disconnect (Ctrl+D)">
+        <span class="tb-ico-wrap"><svg class="tb-ico" viewBox="0 0 24 24"><use href="#ico-disconnect"/></svg></span>
+        <span class="tb-label">Cancel</span>
+      </button>
+      <span class="tb-sep"></span>
+      <button type="button" data-tab="servers" class="tb-nav" title="Servers (Ctrl+1)">
+        <span class="tb-ico-wrap"><svg class="tb-ico" viewBox="0 0 24 24"><use href="#ico-servers"/></svg></span>
+        <span class="tb-label">Servers</span>
+      </button>
+      <button type="button" data-tab="search" class="tb-nav" title="Search (Ctrl+2)">
+        <span class="tb-ico-wrap"><svg class="tb-ico" viewBox="0 0 24 24"><use href="#ico-search"/></svg></span>
+        <span class="tb-label">Search</span>
+      </button>
+      <button type="button" data-tab="transfer" class="tb-nav on" title="Transfer (Ctrl+3)">
+        <span class="tb-ico-wrap"><svg class="tb-ico" viewBox="0 0 24 24"><use href="#ico-transfer"/></svg></span>
+        <span class="tb-label">Transfer</span>
+      </button>
+      <button type="button" data-tab="shared" class="tb-nav" title="Shared (Ctrl+4)">
+        <span class="tb-ico-wrap"><svg class="tb-ico" viewBox="0 0 24 24"><use href="#ico-shared"/></svg></span>
+        <span class="tb-label">Shared</span>
+      </button>
+      <button type="button" data-tab="messages" class="tb-nav" title="Messages (Ctrl+5)">
+        <span class="tb-ico-wrap"><svg class="tb-ico" viewBox="0 0 24 24"><use href="#ico-messages"/></svg></span>
+        <span class="tb-label">Messages</span>
+      </button>
+      <button type="button" data-tab="irc" class="tb-nav" title="IRC (Ctrl+6)">
+        <span class="tb-ico-wrap"><svg class="tb-ico" viewBox="0 0 24 24"><use href="#ico-irc"/></svg></span>
+        <span class="tb-label">IRC</span>
+      </button>
+      <button type="button" data-tab="stats" class="tb-nav" title="Statistics (Ctrl+7)">
+        <span class="tb-ico-wrap"><svg class="tb-ico" viewBox="0 0 24 24"><use href="#ico-stats"/></svg></span>
+        <span class="tb-label">Stats</span>
+      </button>
+      <button type="button" data-tab="kad" class="tb-nav" title="Kad (Ctrl+8)">
+        <span class="tb-ico-wrap"><svg class="tb-ico" viewBox="0 0 24 24"><use href="#ico-kad"/></svg></span>
+        <span class="tb-label">Kad</span>
+      </button>
+      <button type="button" data-tab="logs" class="tb-nav" title="Server log (Ctrl+9)">
+        <span class="tb-ico-wrap"><svg class="tb-ico" viewBox="0 0 24 24"><use href="#ico-logs"/></svg></span>
+        <span class="tb-label">Log</span>
+      </button>
+      <button type="button" data-tab="prefs" class="tb-nav" title="Preferences (Ctrl+0)">
+        <span class="tb-ico-wrap"><svg class="tb-ico" viewBox="0 0 24 24"><use href="#ico-prefs"/></svg></span>
+        <span class="tb-label">Options</span>
+      </button>
     </div>
-    <div class="tabs" id="tabs">
-      <button data-tab="servers">Servers</button>
-      <button data-tab="search">Search</button>
-      <button data-tab="transfer" class="on">Transfer</button>
-      <button data-tab="shared">Shared Files</button>
-      <button data-tab="messages">Messages</button>
-      <button data-tab="irc">IRC</button>
-      <button data-tab="stats">Statistics</button>
-      <button data-tab="kad">Kad</button>
-      <button data-tab="prefs">Preferences</button>
-    </div>
+
     <div class="workspace">
       <section id="view-servers" class="view">
+        <div class="hint">VMLF server list — double-click a server to connect. Add servers manually or import server.met.</div>
         <div class="split-top">
           <table class="lv" id="tbl-servers">
             <thead><tr><th>Server Name</th><th>IP</th><th>Description</th><th>Ping</th><th>Users</th><th>Files</th><th>Static</th></tr></thead>
@@ -57,15 +111,16 @@
           <label>IP <input id="srv-ip" placeholder="1.2.3.4"></label>
           <label>Port <input id="srv-port" value="4661" size="6"></label>
           <label>Name <input id="srv-name" placeholder="My server"></label>
-          <button id="srv-add">Add</button>
-          <button id="srv-connect">Connect to selected</button>
-          <button id="srv-remove">Remove</button>
+          <button type="button" id="srv-add">Add</button>
+          <button type="button" id="srv-connect">Connect to selected</button>
+          <button type="button" id="srv-remove">Remove</button>
         </div>
       </section>
 
       <section id="view-search" class="view">
-        <div class="formrow">
-          <input id="q" placeholder="Search term (legal / public-domain catalog)" size="40">
+        <div class="hint">Search the legal demo catalog on Kad, local server, or global VMLF network. Double-click a result to download.</div>
+        <div class="formrow search-quick">
+          <input type="text" id="q" placeholder="Search term (try ubuntu, blender, gutenberg…)" size="40">
           <select id="q-type">
             <option>Any</option><option>Archive</option><option>Audio</option>
             <option>Video</option><option>Program</option><option>Document</option>
@@ -75,61 +130,72 @@
             <option value="local">Local server</option>
             <option value="global">Global</option>
           </select>
-          <button id="q-go">Search</button>
+          <button type="button" id="q-go">Start Search</button>
+          <button type="button" id="q-dl">Download selected</button>
         </div>
-        <table class="lv" id="tbl-search">
-          <thead><tr><th>File Name</th><th>Size</th><th>Sources</th><th>Type</th><th>Hash</th></tr></thead>
-          <tbody></tbody>
-        </table>
-        <div class="formrow"><button id="q-dl">Download selected</button></div>
-      </section>
-
-      <section id="view-transfer" class="view on">
-        <div class="pane-label">Downloads</div>
         <div class="split-top">
-          <table class="lv" id="tbl-down">
-            <thead><tr><th>File Name</th><th>Size</th><th>Transferred</th><th>Completed</th><th>Speed</th><th>Sources</th><th>Priority</th><th>Status</th></tr></thead>
+          <table class="lv" id="tbl-search">
+            <thead><tr><th>File Name</th><th>Size</th><th>Sources</th><th>Type</th><th>Hash</th></tr></thead>
             <tbody></tbody>
           </table>
         </div>
-        <div class="formrow">
-          <button data-dl="resume">Resume</button>
-          <button data-dl="pause">Pause</button>
-          <button data-dl="cancel">Cancel</button>
-          <button data-dl="prioup">Prio up</button>
-          <button data-dl="priodown">Prio down</button>
-          <label>ed2k:// <input id="ed2k" size="48" placeholder="ed2k://|file|name|size|hash|/"></label>
-          <button id="ed2k-add">Add link</button>
+      </section>
+
+      <section id="view-transfer" class="view on">
+        <div class="transfer-split">
+          <div class="transfer-down">
+            <div class="pane-label">Downloads</div>
+            <div class="split-top">
+              <table class="lv" id="tbl-down">
+                <thead><tr><th>File Name</th><th>Size</th><th>Transferred</th><th>Completed</th><th>Speed</th><th>Sources</th><th>Priority</th><th>Status</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="transfer-up">
+            <div class="pane-label">Uploading</div>
+            <table class="lv" id="tbl-up">
+              <thead><tr><th>User</th><th>File</th><th>Transferred</th><th>Speed</th><th>Software</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
         </div>
-        <div class="pane-label">Uploading</div>
-        <table class="lv" id="tbl-up">
-          <thead><tr><th>User</th><th>File</th><th>Transferred</th><th>Speed</th><th>Software</th></tr></thead>
-          <tbody></tbody>
-        </table>
+        <div class="formrow">
+          <button type="button" data-dl="resume">Resume</button>
+          <button type="button" data-dl="pause">Pause</button>
+          <button type="button" data-dl="cancel">Cancel</button>
+          <button type="button" data-dl="prioup">Prio up</button>
+          <button type="button" data-dl="priodown">Prio down</button>
+          <label>VMLF <input id="vmlf-link" size="48" placeholder="vmlf://|file|name|size|hash|/"></label>
+          <button type="button" id="vmlf-add">Add link</button>
+        </div>
       </section>
 
       <section id="view-shared" class="view">
-        <table class="lv" id="tbl-shared">
-          <thead><tr><th>File Name</th><th>Size</th><th>Requests</th><th>Accepted</th><th>Transferred</th><th>Priority</th></tr></thead>
-          <tbody></tbody>
-        </table>
-        <div class="formrow"><button id="shared-reload">Reload</button></div>
+        <div class="hint">Files you are sharing on the VMLF network.</div>
+        <div class="split-top">
+          <table class="lv" id="tbl-shared">
+            <thead><tr><th>File Name</th><th>Size</th><th>Requests</th><th>Accepted</th><th>Transferred</th><th>Priority</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="formrow"><button type="button" id="shared-reload">Reload shared files</button></div>
       </section>
 
       <section id="view-messages" class="view">
         <div id="msg-log" class="logbox"></div>
         <div class="formrow">
           <input id="msg-text" size="60" placeholder="Message to friends / room">
-          <button id="msg-send">Send</button>
+          <button type="button" id="msg-send">Send</button>
         </div>
       </section>
 
       <section id="view-irc" class="view">
-        <p class="hint">IRC client — #vmule. This is a local echo room for the demo client.</p>
+        <div class="hint">IRC — channel #vmule</div>
         <div id="irc-log" class="logbox"></div>
         <div class="formrow">
           <input id="irc-text" size="60" placeholder="Message #vmule">
-          <button id="irc-send">Send</button>
+          <button type="button" id="irc-send">Send</button>
         </div>
       </section>
 
@@ -141,11 +207,20 @@
       </section>
 
       <section id="view-kad" class="view">
+        <div class="hint">Kademlia decentralized network — works alongside VMLF servers.</div>
         <div class="formrow">
-          <button id="kad-start">Connect Kad</button>
-          <button id="kad-stop">Disconnect Kad</button>
+          <button type="button" id="kad-start">Connect Kad</button>
+          <button type="button" id="kad-stop">Disconnect Kad</button>
         </div>
         <div id="kad-info" class="logbox"></div>
+      </section>
+
+      <section id="view-logs" class="view">
+        <div class="hint">Server log — connection events, searches, and transfers.</div>
+        <div id="full-log" class="logbox"></div>
+        <div class="formrow">
+          <button type="button" id="log-clear">Clear log</button>
+        </div>
       </section>
 
       <section id="view-prefs" class="view">
@@ -153,24 +228,44 @@
           <fieldset><legend>General</legend>
             <label>Nickname <input id="set-nick"></label>
           </fieldset>
-          <fieldset><legend>Connection</legend>
-            <label>Max download KB/s (0=unlimited) <input id="set-down" type="number"></label>
-            <label>Max upload KB/s <input id="set-up" type="number"></label>
+          <fieldset><legend>Display</legend>
+            <label>Skin profile
+              <select id="set-skin">
+                <option value="classic">Default Classic</option>
+                <option value="luna">XP Luna</option>
+                <option value="polar">POLAR</option>
+              </select>
+            </label>
+            <p class="hint">POLAR — icy blue title bar and cool list colors. Skins live in <code>skins/</code> (INI + icons).</p>
+          </fieldset>
+          <fieldset><legend>Connection (VMLF)</legend>
+            <label>Max download KB/s (0 = unlimited) <input id="set-down" type="number" min="0"></label>
+            <label>Max upload KB/s <input id="set-up" type="number" min="0"></label>
             <label>TCP port <input id="set-port" type="number"></label>
             <label>UDP port <input id="set-udp" type="number"></label>
             <label>Max connections <input id="set-conn" type="number"></label>
             <label><input id="set-obf" type="checkbox"> Protocol obfuscation</label>
           </fieldset>
-          <fieldset><legend>Webinterface</legend>
-            <label><input id="set-web" type="checkbox"> Enable webinterface (aMule-style panel)</label>
-            <label>Web port <input id="set-webport" type="number"></label>
-            <p class="hint">Open <a href="/panel/" target="_blank">/panel/</a> — sign in with the password from your environment, not from this window.</p>
-          </fieldset>
-          <button id="set-save">Apply</button>
+          <button type="button" id="set-save">Apply</button>
         </div>
       </section>
     </div>
-    <div class="statusbar" id="status"></div>
+
+    <div class="console" id="console">
+      <div class="console-head" id="console-head">
+        <span>Server log</span>
+        <button type="button" id="console-toggle" title="Collapse">▼</button>
+      </div>
+      <div class="console-body" id="console-log"></div>
+    </div>
+
+    <div class="statusbar" id="statusbar">
+      <div class="sb-seg" id="sb-vmlf"><span class="sb-led" id="led-vmlf"></span> VMLF</div>
+      <div class="sb-seg" id="sb-kad"><span class="sb-led" id="led-kad"></span> Kad</div>
+      <div class="sb-seg" id="sb-dl">▼ 0 B/s</div>
+      <div class="sb-seg" id="sb-ul">▲ 0 B/s</div>
+      <div class="sb-seg grow" id="sb-info"></div>
+    </div>
   </div>
   <script src="js/client.js"></script>
 </body>

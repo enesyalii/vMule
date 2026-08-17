@@ -10,9 +10,9 @@
 <script src="/website/js/chrome.js"></script>
 <script>
 document.write(vmuleChrome(`
-  <h2>Shop — vMule servers</h2>
-  <p>Buy a High-ID node or a dedicated ED2K server. Checkout is Stripe-hosted. After payment the node is injected into your client server list and can be controlled from the panel.</p>
-  <div class="notice" id="stripe-note">Checking payment mode...</div>
+  <h2>Shop — vMule server packs</h2>
+  <p>Buy a shared High-ID VMLF node pack. Checkout is hosted by Stripe or Polar. After payment the node is injected into your client server list.</p>
+  <div class="notice" id="pay-note">Checking payment providers...</div>
   <div class="plans" id="plans"></div>
   <h3>Your purchases</h3>
   <table class="std" id="purchases"><tr><th>Plan</th><th>Status</th><th>When</th></tr></table>
@@ -23,45 +23,65 @@ function money(cents, cur) {
   return new Intl.NumberFormat("en-US", { style: "currency", currency: (cur || "usd").toUpperCase() }).format(cents / 100);
 }
 
+function checkoutBtn(planId, provider, label, cls) {
+  return `<button class="btn ${cls || "gold"}" data-plan="${planId}" data-provider="${provider}">${label}</button>`;
+}
+
 fetch("/api/plans").then(r => r.json()).then(data => {
-  document.getElementById("stripe-note").textContent = data.stripeConfigured
-    ? "Stripe is configured. You will be redirected to a Stripe Checkout page."
-    : "Stripe keys are not set. Checkout runs in demo mode and activates the server immediately. Add STRIPE_SECRET_KEY in .env for real payments.";
+  const stripeOn = data.stripeConfigured;
+  const polarOn = data.polarConfigured;
+  const note = document.getElementById("pay-note");
+  if (stripeOn && polarOn) {
+    note.textContent = "Stripe and Polar are configured. Pick either checkout button.";
+  } else if (stripeOn) {
+    note.textContent = "Stripe checkout is live. Polar is not configured (set POLAR_ACCESS_TOKEN + product IDs).";
+  } else if (polarOn) {
+    note.textContent = "Polar checkout is live. Stripe is not configured.";
+  } else {
+    note.textContent = "No payment keys set — checkout runs in demo mode and activates the server immediately. Add STRIPE_SECRET_KEY or POLAR_ACCESS_TOKEN in server environment.";
+  }
+
   const root = document.getElementById("plans");
-  Object.values(data.plans).forEach((plan, i) => {
+  Object.values(data.plans).forEach((plan) => {
     const el = document.createElement("div");
     el.className = "plan" + (plan.id === "pro" ? " featured" : "");
+    const buttons = [];
+    if (stripeOn || !polarOn) buttons.push(checkoutBtn(plan.id, "stripe", stripeOn ? "Buy with Stripe" : "Demo checkout"));
+    if (polarOn) buttons.push(checkoutBtn(plan.id, "polar", "Buy with Polar", "gold"));
     el.innerHTML = `
       <h3>${plan.name}</h3>
-      <div class="price">${money(plan.amount, plan.currency)} <small>${plan.interval ? "/" + plan.interval : "one-time"}</small></div>
+      <div class="price">${money(plan.amount, plan.currency)} <small>/${plan.interval}</small></div>
       <p class="muted">${plan.tagline}</p>
       <ul>${plan.features.map(f => `<li>${f}</li>`).join("")}</ul>
-      <button class="btn gold" data-plan="${plan.id}">Buy with Stripe</button>
+      <div class="plan-actions">${buttons.join(" ")}</div>
     `;
     root.appendChild(el);
   });
+
   root.querySelectorAll("button[data-plan]").forEach(btn => {
     btn.onclick = async () => {
+      const label = btn.textContent;
       btn.disabled = true;
       btn.textContent = "Redirecting...";
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ planId: btn.dataset.plan }),
+        body: JSON.stringify({ planId: btn.dataset.plan, provider: btn.dataset.provider }),
       });
       const json = await res.json();
       if (json.url) location.href = json.url;
       else {
         alert(json.error || "Checkout failed");
         btn.disabled = false;
-        btn.textContent = "Buy with Stripe";
+        btn.textContent = label;
       }
     };
   });
+
   const t = document.getElementById("purchases");
   (data.purchases || []).forEach(p => {
     const tr = document.createElement("tr");
-    tr.innerHTML = `<td>${p.planName}</td><td>paid${p.demo ? " (demo)" : ""}</td><td>${p.paidAt || ""}</td>`;
+    tr.innerHTML = `<td>${p.planName}</td><td>paid${p.demo ? " (demo)" : ""}${p.provider ? " · " + p.provider : ""}</td><td>${p.paidAt || ""}</td>`;
     t.appendChild(tr);
   });
 });

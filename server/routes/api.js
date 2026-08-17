@@ -112,14 +112,6 @@ function createClientRoutes(engine, stripe) {
     res.json(result);
   });
 
-  router.post("/panel/login", (req, res) => {
-    const password = req.body?.password;
-    if (!config.PANEL_PASSWORD || password !== config.PANEL_PASSWORD) {
-      return res.status(401).json({ error: "Wrong password" });
-    }
-    res.json({ ok: true, token: "panel-ok" });
-  });
-
   return router;
 }
 

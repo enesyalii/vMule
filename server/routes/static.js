@@ -25,7 +25,6 @@ function mountStatic(app) {
   }
 
   app.use("/client", express.static(path.join(publicDir, "client")));
-  app.use("/panel", express.static(path.join(publicDir, "panel")));
   app.use("/website", express.static(path.join(publicDir, "website")));
   app.use(express.static(websiteDir));
 

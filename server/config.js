@@ -13,7 +13,6 @@ const BASE_URL =
 module.exports = {
   PORT,
   BASE_URL,
-  PANEL_PASSWORD: process.env.PANEL_PASSWORD || "",
   STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY || "",
   STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET || "",
   INSTALLER_URL:

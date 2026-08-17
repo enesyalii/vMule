@@ -28,7 +28,7 @@ const PLANS = {
       "Priority shared node, High ID",
       "400 concurrent connections",
       "Source exchange boost",
-      "Control panel remote access",
+      "Priority queue access",
     ],
   },
   dedicated: {

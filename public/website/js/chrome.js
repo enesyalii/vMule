@@ -45,7 +45,6 @@
       <ul class="navlist">
         ${links.map(([href, label]) => `<li><a href="${href}">${label}</a></li>`).join("")}
         <li><a href="/client/">Open vMule client</a></li>
-        <li><a href="/panel/">Control panel</a></li>
       </ul>
       <div class="box-h">News Help</div>
       <div class="box-b muted">Read the FAQ before posting. The forum is staffed by volunteers, not paid support.</div>

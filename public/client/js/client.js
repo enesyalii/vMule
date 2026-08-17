@@ -34,7 +34,6 @@ const MENUS = {
   ],
   help: [
     { label: "vMule website", action: () => { location.href = "/"; } },
-    { label: "Web interface", action: () => { location.href = "/panel/"; } },
     { label: "Buy server", action: () => { location.href = "/shop.html"; } },
   ],
 };
@@ -343,8 +342,6 @@ function fillPrefs() {
   $("#set-udp").value = s.udpPort;
   $("#set-conn").value = s.maxConnections;
   $("#set-obf").checked = s.obfuscation;
-  $("#set-web").checked = s.webEnabled;
-  $("#set-webport").value = s.webPort;
 }
 
 function drawSpeed() {
@@ -520,8 +517,6 @@ $("#set-save").onclick = () =>
       udpPort: Number($("#set-udp").value),
       maxConnections: Number($("#set-conn").value),
       obfuscation: $("#set-obf").checked,
-      webEnabled: $("#set-web").checked,
-      webPort: Number($("#set-webport").value),
     },
   }).then((s) => {
     state = s;

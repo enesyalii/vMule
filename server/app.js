@@ -77,7 +77,6 @@ function startServer() {
   const httpServer = boot.app.listen(config.PORT, () => {
     console.log(`vMule site     http://localhost:${config.PORT}/`);
     console.log(`vMule client   http://localhost:${config.PORT}/client/`);
-    console.log(`Control panel  http://localhost:${config.PORT}/panel/`);
     console.log(`Shop           http://localhost:${config.PORT}/shop.html`);
     console.log(`API events     http://localhost:${config.PORT}/api/events (SSE)`);
     console.log(`Stripe         ${boot.stripe ? "keys loaded" : "demo mode (no STRIPE_SECRET_KEY)"}`);

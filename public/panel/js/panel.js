@@ -57,11 +57,16 @@ function rows(table, html) {
   table.querySelector("tbody").innerHTML = html;
 }
 
+function vmlfState() {
+  return state.vmlf || state.ed2k || { connected: false, id: "off" };
+}
+
 function render() {
   if (!state) return;
-  const srv = state.servers.find((s) => s.id === state.ed2k.serverId);
+  const vf = vmlfState();
+  const srv = state.servers.find((s) => s.id === vf.serverId);
   $("#head-status").innerHTML = `
-    <span>ED2K ${state.ed2k.connected ? state.ed2k.id : "off"} ${srv ? "· " + srv.name : ""}</span>
+    <span>VMLF ${vf.connected ? vf.id : "off"} ${srv ? "· " + srv.name : ""}</span>
     <span>Kad ${state.kad.connected ? "on" : "off"}</span>
     <span>${state.nickname}</span>`;
   $("#foot").innerHTML = `<span>▼ ${fmt(state.currentDown || 0)}/s</span><span>▲ ${fmt(state.currentUp || 0)}/s</span><span>Webinterface · port ${state.settings.webPort}</span>`;
@@ -162,7 +167,7 @@ function cmd(path, body) {
 $$("button[data-dl]").forEach((b) => {
   b.onclick = () => sel.down && cmd(`/api/downloads/${sel.down}/${b.dataset.dl}`);
 });
-$("#ed2k-add").onclick = () => cmd("/api/ed2k", { link: $("#ed2k").value });
+$("#vmlf-add").onclick = () => cmd("/api/vmlf", { link: $("#vmlf").value });
 $("#reload-shared").onclick = () => cmd("/api/shared/reload");
 $("#q-go").onclick = () => cmd("/api/search", { term: $("#q").value, network: $("#q-net").value });
 $("#q-dl").onclick = () => sel.search && cmd("/api/search/download", { hash: sel.search });

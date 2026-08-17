@@ -6,6 +6,7 @@ const { v4: uuid } = require("uuid");
 const { Stripe } = require("stripe");
 const store = require("./store");
 const { loadState, saveState } = require("./persist");
+const { parseLink } = require("./vmlf");
 const { PLANS, createCheckoutSession } = require("./stripe");
 const {
   createInitialState,
@@ -155,18 +156,18 @@ app.get("/api/state", (_req, res) => {
 
 app.post("/api/connect", (_req, res) => {
   state.connected = true;
-  state.ed2k.connected = true;
-  state.ed2k.id = "High ID";
-  if (!state.ed2k.serverId && state.servers[0]) state.ed2k.serverId = state.servers[0].id;
+  state.vmlf.connected = true;
+  state.vmlf.id = "High ID";
+  if (!state.vmlf.serverId && state.servers[0]) state.vmlf.serverId = state.servers[0].id;
   state.logs.unshift(`[${stamp()}] Connecting... High ID`);
   reply(res);
 });
 
 app.post("/api/disconnect", (_req, res) => {
   state.connected = false;
-  state.ed2k.connected = false;
-  state.ed2k.id = "Disconnected";
-  state.logs.unshift(`[${stamp()}] Disconnected from ED2K`);
+  state.vmlf.connected = false;
+  state.vmlf.id = "Disconnected";
+  state.logs.unshift(`[${stamp()}] Disconnected from VMLF`);
   reply(res);
 });
 
@@ -220,24 +221,27 @@ app.post("/api/search/download", (req, res) => {
   reply(res);
 });
 
-app.post("/api/ed2k", (req, res) => {
+function addVmlfLink(req, res) {
   const link = String((req.body && req.body.link) || "").trim();
-  const match = link.match(/ed2k:\/\/\|file\|([^|]+)\|(\d+)\|([0-9A-Fa-f]+)\|/i);
-  if (!match) return res.status(400).json({ error: "Invalid ed2k link" });
+  const parsed = parseLink(link);
+  if (!parsed) return res.status(400).json({ error: "Invalid VMLF link (vmlf://|file|name|size|hash|/)" });
   const item = catalogItem({
-    name: decodeURIComponent(match[1]),
-    size: Number(match[2]),
+    name: parsed.name,
+    size: parsed.size,
     type: "Any",
-    ext: (match[1].split(".").pop() || "").toLowerCase(),
+    ext: (parsed.name.split(".").pop() || "").toLowerCase(),
     sources: 1,
+    hash: parsed.hash,
   });
-  item.hash = match[3].toUpperCase();
-  item.ed2k = link;
+  item.vmlf = parsed.link;
   item.status = "downloading";
   state.downloads.unshift(item);
-  state.logs.unshift(`[${stamp()}] ed2k link added: ${item.name}`);
+  state.logs.unshift(`[${stamp()}] VMLF link added: ${item.name}`);
   reply(res);
-});
+}
+
+app.post("/api/vmlf", addVmlfLink);
+app.post("/api/ed2k", addVmlfLink);
 
 app.post("/api/servers", (req, res) => {
   const { ip, port, name } = req.body || {};
@@ -262,9 +266,9 @@ app.post("/api/servers/:id/connect", (req, res) => {
   const srv = state.servers.find((s) => s.id === req.params.id);
   if (!srv) return res.status(404).json({ error: "not found" });
   state.connected = true;
-  state.ed2k.connected = true;
-  state.ed2k.serverId = srv.id;
-  state.ed2k.id = "High ID";
+  state.vmlf.connected = true;
+  state.vmlf.serverId = srv.id;
+  state.vmlf.id = "High ID";
   state.logs.unshift(`[${stamp()}] Connected to ${srv.name} (${srv.ip}:${srv.port})`);
   reply(res);
 });

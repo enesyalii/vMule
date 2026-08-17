@@ -2,14 +2,14 @@ const PLANS = {
   starter: {
     id: "starter",
     name: "vMule Starter Node",
-    tagline: "A reliable shared ED2K node for everyday sharing.",
+    tagline: "A reliable shared VMLF node for everyday sharing.",
     amount: 499,
     currency: "usd",
     interval: "month",
     mode: "subscription",
     connections: 80,
     features: [
-      "Shared ED2K node, High ID",
+      "Shared VMLF node, High ID",
       "80 concurrent connections",
       "Kad bootstrap included",
       "Email support",
@@ -34,7 +34,7 @@ const PLANS = {
   dedicated: {
     id: "dedicated",
     name: "vMule Dedicated Server",
-    tagline: "Your own ED2K server. Name it, list it, run it.",
+    tagline: "Your own VMLF server. Name it, list it, run it.",
     amount: 2999,
     currency: "usd",
     interval: "month",
@@ -42,7 +42,7 @@ const PLANS = {
     connections: 5000,
     dedicated: true,
     features: [
-      "Dedicated ED2K server process",
+      "Dedicated VMLF server process",
       "Custom server name & description",
       "Up to 5,000 users",
       "Listed in the official server.met",

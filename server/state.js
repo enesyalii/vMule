@@ -1,4 +1,5 @@
 const { v4: uuid } = require("uuid");
+const { formatLink } = require("./vmlf");
 
 function fmtSize(bytes) {
   if (bytes < 1024) return `${bytes} B`;
@@ -42,11 +43,11 @@ const LEGAL_CATALOG = [
 ];
 
 function catalogItem(partial) {
-  const hash = hashLike();
+  const hash = partial.hash || hashLike();
   return {
     id: uuid(),
     hash,
-    ed2k: `ed2k://|file|${partial.name}|${partial.size}|${hash}|/`,
+    vmlf: formatLink(partial.name, partial.size, hash),
     complete: false,
     progress: 0,
     speed: 0,
@@ -92,14 +93,14 @@ function createInitialState() {
 
   const servers = [
     { id: "s1", name: "vMule Razorback", desc: "Official public server", ip: "176.12.44.18", port: 4661, users: 182440, maxUsers: 400000, files: 91200331, ping: 42, static: true, premium: false },
-    { id: "s2", name: "DonkeyServer No1", desc: "Long-running ED2K", ip: "91.204.44.112", port: 4242, users: 64012, maxUsers: 120000, files: 22044190, ping: 88, static: true, premium: false },
+    { id: "s2", name: "DonkeyServer No1", desc: "Long-running VMLF", ip: "91.204.44.112", port: 4242, users: 64012, maxUsers: 120000, files: 22044190, ping: 88, static: true, premium: false },
     { id: "s3", name: "Peerates.net", desc: "EU cluster", ip: "193.111.22.9", port: 4661, users: 22190, maxUsers: 80000, files: 8402211, ping: 61, static: false, premium: false },
     { id: "s4", name: "vMule Kad Gate", desc: "Kad bootstrap helper", ip: "45.9.88.14", port: 4662, users: 9802, maxUsers: 20000, files: 1200441, ping: 27, static: true, premium: false },
   ];
 
   return {
     connected: true,
-    ed2k: {
+    vmlf: {
       connected: true,
       id: "High ID",
       clientId: 184220991,
@@ -173,7 +174,7 @@ function tick(state) {
   let down = 0;
   let up = 0;
 
-  if (state.connected && state.ed2k.connected) {
+  if (state.connected && state.vmlf.connected) {
     for (const d of state.downloads) {
       if (d.status === "downloading" && d.progress < 1) {
         const burst = 20_000 + Math.random() * 180_000;
@@ -200,7 +201,7 @@ function tick(state) {
       u.xfer += u.speed;
       up += u.speed;
     }
-    const srv = state.servers.find((s) => s.id === state.ed2k.serverId);
+    const srv = state.servers.find((s) => s.id === state.vmlf.serverId);
     if (srv) {
       srv.users += Math.floor(Math.random() * 21) - 10;
       srv.users = Math.max(100, srv.users);

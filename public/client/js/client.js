@@ -411,25 +411,37 @@ async function refresh() {
 }
 
 function connectLive() {
-  if (typeof EventSource === "undefined") {
-    refresh();
-    setInterval(refresh, 1000);
-    return;
-  }
-  const es = new EventSource("/api/events");
-  es.onmessage = (e) => {
-    try {
-      state = JSON.parse(e.data);
-      render();
-    } catch {
-      /* ignore parse errors */
+  api("/api/health").then((h) => {
+    const pollMs = h.serverless ? 1500 : 0;
+    if (pollMs) {
+      refresh();
+      setInterval(refresh, pollMs);
     }
-  };
-  es.onerror = () => {
-    es.close();
+    if (pollMs || typeof EventSource === "undefined") {
+      if (!pollMs) {
+        refresh();
+        setInterval(refresh, 1000);
+      }
+      return;
+    }
+    const es = new EventSource("/api/events");
+    es.onmessage = (e) => {
+      try {
+        state = JSON.parse(e.data);
+        render();
+      } catch {
+        /* ignore parse errors */
+      }
+    };
+    es.onerror = () => {
+      es.close();
+      refresh();
+      setInterval(refresh, 1500);
+    };
+  }).catch(() => {
     refresh();
-    setInterval(refresh, 1000);
-  };
+    setInterval(refresh, 1500);
+  });
 }
 
 function cmd(path, body) {

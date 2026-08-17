@@ -1,10 +1,12 @@
 const express = require("express");
 const { v4: uuid } = require("uuid");
 const store = require("../store");
-const { PLANS, createCheckoutSession } = require("../stripe");
+const { PLANS } = require("../plans");
+const { createCheckoutSession } = require("../stripe");
+const { createPolarCheckout } = require("../polar");
 const config = require("../config");
 
-function createClientRoutes(engine, stripe) {
+function createClientRoutes(engine, stripe, polar) {
   const router = express.Router();
 
   router.get("/health", (_req, res) => {
@@ -14,6 +16,8 @@ function createClientRoutes(engine, stripe) {
       version: "0.51.0",
       protocol: "VMLF",
       stripe: Boolean(stripe),
+      polar: Boolean(polar),
+      serverless: config.isServerless,
       tcp: config.VMLF_TCP_ENABLED ? config.VMLF_TCP_PORT : null,
     });
   });
@@ -115,44 +119,60 @@ function createClientRoutes(engine, stripe) {
   return router;
 }
 
-function createShopRoutes(engine, stripe) {
+function demoCheckout(engine, plan) {
+  const demo = {
+    id: `demo_${uuid()}`,
+    planId: plan.id,
+    planName: plan.name,
+    amount: plan.amount,
+    currency: plan.currency,
+    customerEmail: "demo@vmule.local",
+    mode: plan.mode,
+    provider: "demo",
+    paidAt: new Date().toISOString(),
+    demo: true,
+  };
+  engine.fulfillPurchase(demo);
+  return {
+    demo: true,
+    url: `${config.BASE_URL}/shop-success.html?session_id=${demo.id}&demo=1`,
+    id: demo.id,
+  };
+}
+
+function createShopRoutes(engine, stripe, polar) {
   const router = express.Router();
 
   router.get("/plans", (_req, res) => {
     res.json({
       plans: PLANS,
       stripeConfigured: Boolean(stripe),
+      polarConfigured: Boolean(polar),
       purchases: engine.purchases.filter((p) => p.status === "paid"),
     });
   });
 
   router.post("/checkout", async (req, res) => {
     const planId = req.body?.planId;
+    const provider = String(req.body?.provider || "stripe").toLowerCase();
     const plan = PLANS[planId];
     if (!plan) return res.status(400).json({ error: "Unknown plan" });
 
-    if (!stripe) {
-      const demo = {
-        id: `demo_${uuid()}`,
-        planId: plan.id,
-        planName: plan.name,
-        amount: plan.amount,
-        currency: plan.currency,
-        customerEmail: "demo@vmule.local",
-        mode: plan.mode,
-        paidAt: new Date().toISOString(),
-        demo: true,
-      };
-      engine.fulfillPurchase(demo);
-      return res.json({
-        demo: true,
-        url: `${config.BASE_URL}/shop-success.html?session_id=${demo.id}&demo=1`,
-      });
+    if (provider === "polar") {
+      if (!polar) return res.json(demoCheckout(engine, plan));
+      try {
+        const session = await createPolarCheckout(polar, plan, config.BASE_URL);
+        return res.json({ url: session.url, id: session.id, provider: "polar" });
+      } catch (err) {
+        return res.status(500).json({ error: err.message || "Polar error" });
+      }
     }
+
+    if (!stripe) return res.json(demoCheckout(engine, plan));
 
     try {
       const session = await createCheckoutSession(stripe, plan, config.BASE_URL);
-      res.json({ url: session.url, id: session.id });
+      res.json({ url: session.url, id: session.id, provider: "stripe" });
     } catch (err) {
       res.status(500).json({ error: err.message || "Stripe error" });
     }
@@ -162,6 +182,28 @@ function createShopRoutes(engine, stripe) {
     const id = req.params.id;
     const local = engine.purchases.find((p) => p.id === id);
     if (local) return res.json(local);
+
+    const provider = String(req.query.provider || "").toLowerCase();
+
+    if (provider === "polar" && polar) {
+      try {
+        const checkout = await polar.checkouts.get({ id });
+        const planId = checkout.metadata?.plan_id;
+        const plan = PLANS[planId];
+        return res.json({
+          id: checkout.id,
+          status: checkout.status === "succeeded" ? "paid" : checkout.status,
+          planId,
+          planName: plan?.name,
+          amount: checkout.totalAmount,
+          currency: checkout.currency,
+          provider: "polar",
+        });
+      } catch (err) {
+        return res.status(404).json({ error: err.message });
+      }
+    }
+
     if (!stripe) return res.status(404).json({ error: "not found" });
     try {
       const session = await stripe.checkout.sessions.retrieve(id);
@@ -171,6 +213,7 @@ function createShopRoutes(engine, stripe) {
         amount: session.amount_total,
         currency: session.currency,
         planId: session.metadata?.plan_id,
+        provider: "stripe",
       });
     } catch (err) {
       res.status(404).json({ error: err.message });

@@ -45,7 +45,12 @@ Output: `dist/vMule-Setup-0.51.0.exe`
 
 Put a [restricted API key](https://docs.stripe.com/keys/restricted-api-keys) in `STRIPE_SECRET_KEY`. Checkout uses Stripe Checkout Sessions. Webhook: `POST /api/stripe/webhook`.
 
-Without keys, the shop runs in demo mode.
+## Polar
+
+Organization access token in `POLAR_ACCESS_TOKEN`. Map products with `POLAR_PRODUCT_STARTER` and `POLAR_PRODUCT_PRO`. Webhook: `POST /api/polar/webhook` (subscribe to `order.paid`). Set `POLAR_SANDBOX=1` for sandbox API.
+
+Without payment keys, the shop runs in demo mode.
+
 
 ## Layout
 

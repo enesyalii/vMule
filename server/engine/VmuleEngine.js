@@ -3,7 +3,7 @@ const { v4: uuid } = require("uuid");
 const store = require("../store");
 const { loadState, saveState } = require("../persist");
 const { parseLink } = require("../vmlf");
-const { PLANS } = require("../stripe");
+const { PLANS } = require("../plans");
 const {
   createInitialState,
   publicState,

@@ -1,69 +1,4 @@
-const PLANS = {
-  starter: {
-    id: "starter",
-    name: "vMule Starter Node",
-    tagline: "A reliable shared VMLF node for everyday sharing.",
-    amount: 499,
-    currency: "usd",
-    interval: "month",
-    mode: "subscription",
-    connections: 80,
-    features: [
-      "Shared VMLF node, High ID",
-      "80 concurrent connections",
-      "Kad bootstrap included",
-      "Email support",
-    ],
-  },
-  pro: {
-    id: "pro",
-    name: "vMule Pro Node",
-    tagline: "More slots, faster queues, priority Kad.",
-    amount: 1299,
-    currency: "usd",
-    interval: "month",
-    mode: "subscription",
-    connections: 400,
-    features: [
-      "Priority shared node, High ID",
-      "400 concurrent connections",
-      "Source exchange boost",
-      "Priority queue access",
-    ],
-  },
-  dedicated: {
-    id: "dedicated",
-    name: "vMule Dedicated Server",
-    tagline: "Your own VMLF server. Name it, list it, run it.",
-    amount: 2999,
-    currency: "usd",
-    interval: "month",
-    mode: "subscription",
-    connections: 5000,
-    dedicated: true,
-    features: [
-      "Dedicated VMLF server process",
-      "Custom server name & description",
-      "Up to 5,000 users",
-      "Listed in the official server.met",
-    ],
-  },
-  kadboost: {
-    id: "kadboost",
-    name: "Kad Boost Pack",
-    tagline: "One-time nodes.dat pack and firewall helper.",
-    amount: 999,
-    currency: "usd",
-    interval: null,
-    mode: "payment",
-    connections: 0,
-    features: [
-      "Fresh Kad nodes.dat",
-      "Obfuscated UDP helper",
-      "Lifetime download",
-    ],
-  },
-};
+const { PLANS } = require("./plans");
 
 function randomSuffix(n = 8) {
   const letters = "abcdefghijklmnopqrstuvwxyz";
@@ -75,7 +10,7 @@ function randomSuffix(n = 8) {
 }
 
 async function createCheckoutSession(stripe, plan, baseUrl) {
-  const successUrl = `${baseUrl}/shop-success.html?session_id={CHECKOUT_SESSION_ID}`;
+  const successUrl = `${baseUrl}/shop-success.html?session_id={CHECKOUT_SESSION_ID}&provider=stripe`;
   const cancelUrl = `${baseUrl}/shop-cancel.html`;
 
   const priceData = {

@@ -6,7 +6,7 @@ const { createCheckoutSession } = require("../stripe");
 const { createPolarCheckout } = require("../polar");
 const config = require("../config");
 
-function createClientRoutes(engine, stripe, polar) {
+function createClientRoutes(engine, stripe, polar, requireUser) {
   const router = express.Router();
 
   router.get("/health", (_req, res) => {
@@ -47,6 +47,9 @@ function createClientRoutes(engine, stripe, polar) {
     engine.on("update", push);
     req.on("close", () => engine.off("update", push));
   });
+
+  // Reading status is public; changing the running client requires an account.
+  router.use(requireUser);
 
   router.post("/connect", (_req, res) => res.json(engine.connect()));
   router.post("/disconnect", (_req, res) => res.json(engine.disconnect()));
@@ -119,14 +122,15 @@ function createClientRoutes(engine, stripe, polar) {
   return router;
 }
 
-function demoCheckout(engine, plan) {
+function demoCheckout(engine, plan, user) {
   const demo = {
     id: `demo_${uuid()}`,
     planId: plan.id,
     planName: plan.name,
     amount: plan.amount,
     currency: plan.currency,
-    customerEmail: "demo@vmule.local",
+    customerEmail: user.email || "demo@vmule.local",
+    accountId: user.id,
     mode: plan.mode,
     provider: "demo",
     paidAt: new Date().toISOString(),
@@ -140,38 +144,54 @@ function demoCheckout(engine, plan) {
   };
 }
 
-function createShopRoutes(engine, stripe, polar) {
+function createShopRoutes(engine, stripe, polar, requireUser) {
   const router = express.Router();
 
-  router.get("/plans", (_req, res) => {
+  router.get("/plans", (req, res) => {
     res.json({
       plans: PLANS,
       stripeConfigured: Boolean(stripe),
       polarConfigured: Boolean(polar),
-      purchases: engine.purchases.filter((p) => p.status === "paid"),
+      purchases: req.user
+        ? engine.purchases.filter(
+            (purchase) =>
+              purchase.status === "paid" &&
+              (purchase.accountId === req.user.id || req.user.role === "admin")
+          )
+        : [],
     });
   });
 
-  router.post("/checkout", async (req, res) => {
+  router.post("/checkout", requireUser, async (req, res) => {
     const planId = req.body?.planId;
     const provider = String(req.body?.provider || "stripe").toLowerCase();
     const plan = PLANS[planId];
     if (!plan) return res.status(400).json({ error: "Unknown plan" });
 
     if (provider === "polar") {
-      if (!polar) return res.json(demoCheckout(engine, plan));
+      if (!polar) return res.json(demoCheckout(engine, plan, req.user));
       try {
-        const session = await createPolarCheckout(polar, plan, config.BASE_URL);
+        const session = await createPolarCheckout(
+          polar,
+          plan,
+          config.BASE_URL,
+          req.user
+        );
         return res.json({ url: session.url, id: session.id, provider: "polar" });
       } catch (err) {
         return res.status(500).json({ error: err.message || "Polar error" });
       }
     }
 
-    if (!stripe) return res.json(demoCheckout(engine, plan));
+    if (!stripe) return res.json(demoCheckout(engine, plan, req.user));
 
     try {
-      const session = await createCheckoutSession(stripe, plan, config.BASE_URL);
+      const session = await createCheckoutSession(
+        stripe,
+        plan,
+        config.BASE_URL,
+        req.user
+      );
       res.json({ url: session.url, id: session.id, provider: "stripe" });
     } catch (err) {
       res.status(500).json({ error: err.message || "Stripe error" });

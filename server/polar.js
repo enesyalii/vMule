@@ -33,7 +33,7 @@ function polarProductId(plan) {
   return config.POLAR_PRODUCT_IDS[plan.id] || "";
 }
 
-async function createPolarCheckout(polar, plan, baseUrl) {
+async function createPolarCheckout(polar, plan, baseUrl, user) {
   const productId = polarProductId(plan);
   if (!productId) {
     throw new Error(`Polar product not configured for plan "${plan.id}" (set POLAR_PRODUCT_${plan.id.toUpperCase()})`);
@@ -43,7 +43,12 @@ async function createPolarCheckout(polar, plan, baseUrl) {
   const checkout = await polar.checkouts.create({
     products: [productId],
     successUrl,
-    metadata: { plan_id: plan.id, product: "vmule-server" },
+    customerEmail: user?.email || undefined,
+    metadata: {
+      plan_id: plan.id,
+      product: "vmule-server",
+      account_id: user?.id || "",
+    },
   });
 
   return { id: checkout.id, url: checkout.url };

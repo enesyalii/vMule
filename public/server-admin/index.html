@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>vMule Server Console</title>
+  <link rel="icon" href="/website/img/logo.svg">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <header class="topbar">
+    <a href="/" class="brand">
+      <img src="/website/img/logo.svg" alt="">
+      <span>vMule <b>Server Console</b></span>
+    </a>
+    <div class="top-actions">
+      <span id="identity">Checking session…</span>
+      <a href="/client/">Client</a>
+      <a href="/account/">Account</a>
+      <button type="button" id="logout">Sign out</button>
+    </div>
+  </header>
+
+  <main>
+    <div id="error-banner" class="banner error" hidden></div>
+    <div id="storage-banner" class="banner warn" hidden>
+      Accounts are using non-persistent serverless storage. Set <code>DATABASE_URL</code>
+      or configure <code>ADMIN_PASSWORD</code> before production use.
+    </div>
+
+    <section class="hero">
+      <div>
+        <p class="eyebrow">Operations</p>
+        <h1>Server overview</h1>
+        <p id="updated-at" class="muted">Loading live state…</p>
+      </div>
+      <div class="quick-actions">
+        <button data-action="connect">Connect VMLF</button>
+        <button data-action="disconnect" class="secondary">Disconnect</button>
+        <button data-action="kad-start">Start Kad</button>
+        <button data-action="kad-stop" class="secondary">Stop Kad</button>
+        <button id="refresh" class="ghost">Refresh</button>
+      </div>
+    </section>
+
+    <section id="metrics" class="metrics"></section>
+
+    <nav class="tabs" aria-label="Server console sections">
+      <button class="active" data-tab="network">Network</button>
+      <button data-tab="transfers">Transfers</button>
+      <button data-tab="servers">Servers</button>
+      <button data-tab="accounts">Accounts</button>
+      <button data-tab="settings">Settings</button>
+      <button data-tab="logs">Logs</button>
+    </nav>
+
+    <section id="tab-network" class="tab active">
+      <div class="grid two">
+        <article class="panel">
+          <div class="panel-head"><h2>VMLF / Kad</h2></div>
+          <dl id="network-details" class="details"></dl>
+        </article>
+        <article class="panel">
+          <div class="panel-head"><h2>Runtime</h2></div>
+          <dl id="runtime-details" class="details"></dl>
+        </article>
+      </div>
+    </section>
+
+    <section id="tab-transfers" class="tab">
+      <article class="panel">
+        <div class="panel-head">
+          <h2>Downloads</h2>
+          <span id="download-count" class="badge"></span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Name</th><th>Progress</th><th>Speed</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="download-rows"></tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+
+    <section id="tab-servers" class="tab">
+      <div class="grid server-grid">
+        <article class="panel">
+          <div class="panel-head"><h2>Server list</h2></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Name</th><th>Address</th><th>Users</th><th>Actions</th></tr></thead>
+              <tbody id="server-rows"></tbody>
+            </table>
+          </div>
+        </article>
+        <form id="add-server" class="panel form-panel">
+          <div class="panel-head"><h2>Add server</h2></div>
+          <label>Name <input name="name" maxlength="60"></label>
+          <label>IP / host <input name="ip" required></label>
+          <label>Port <input name="port" type="number" min="1" max="65535" value="4661" required></label>
+          <button type="submit">Add VMLF server</button>
+          <p id="server-message" class="form-message"></p>
+        </form>
+      </div>
+    </section>
+
+    <section id="tab-accounts" class="tab">
+      <div class="grid account-grid">
+        <article class="panel">
+          <div class="panel-head"><h2>Accounts</h2><span id="user-count" class="badge"></span></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>User</th><th>Email</th><th>Role</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="user-rows"></tbody>
+            </table>
+          </div>
+        </article>
+        <form id="add-user" class="panel form-panel">
+          <div class="panel-head"><h2>Create account</h2></div>
+          <label>Username <input name="username" minlength="3" maxlength="32" required></label>
+          <label>Email <input name="email" type="email"></label>
+          <label>Password <input name="password" type="password" minlength="10" required></label>
+          <label>Role
+            <select name="role"><option value="user">User</option><option value="admin">Administrator</option></select>
+          </label>
+          <button type="submit">Create account</button>
+          <p id="user-message" class="form-message"></p>
+        </form>
+      </div>
+    </section>
+
+    <section id="tab-settings" class="tab">
+      <form id="settings-form" class="panel settings-grid">
+        <div class="panel-head full"><h2>Server settings</h2></div>
+        <label>Nickname <input name="nickname" maxlength="40"></label>
+        <label>Max download KB/s <input name="maxDown" type="number" min="0"></label>
+        <label>Max upload KB/s <input name="maxUp" type="number" min="0"></label>
+        <label>TCP port <input name="port" type="number" min="1" max="65535"></label>
+        <label>UDP port <input name="udpPort" type="number" min="1" max="65535"></label>
+        <label>Max connections <input name="maxConnections" type="number" min="1"></label>
+        <label>Skin
+          <select name="skin"><option value="polar">POLAR</option><option value="luna">XP Luna</option><option value="classic">Classic</option></select>
+        </label>
+        <label class="check"><input name="obfuscation" type="checkbox"> Protocol obfuscation</label>
+        <div class="full"><button type="submit">Save settings</button> <span id="settings-message" class="form-message"></span></div>
+      </form>
+    </section>
+
+    <section id="tab-logs" class="tab">
+      <article class="panel">
+        <div class="panel-head">
+          <h2>Server log</h2>
+          <div>
+            <button data-action="reload-shared" class="secondary">Reload shared</button>
+            <button data-action="reset-logs" class="danger">Clear log</button>
+          </div>
+        </div>
+        <pre id="logs"></pre>
+      </article>
+    </section>
+  </main>
+  <script src="admin.js"></script>
+</body>
+</html>

@@ -11,7 +11,7 @@
 <script>
 document.write(vmuleChrome(`
   <h2>Shop — vMule server packs</h2>
-  <p>Buy a shared High-ID VMLF node pack. Checkout is hosted by Stripe or Polar. After payment the node is injected into your client server list.</p>
+  <p>Buy a shared High-ID VMLF node pack. Sign in, then checkout with Stripe or Polar. After payment the node is injected into your client server list.</p>
   <div class="notice" id="pay-note">Checking payment providers...</div>
   <div class="plans" id="plans"></div>
   <h3>Your purchases</h3>
@@ -69,6 +69,10 @@ fetch("/api/plans").then(r => r.json()).then(data => {
         body: JSON.stringify({ planId: btn.dataset.plan, provider: btn.dataset.provider }),
       });
       const json = await res.json();
+      if (res.status === 401) {
+        location.href = "/account/?next=" + encodeURIComponent("/shop.html");
+        return;
+      }
       if (json.url) location.href = json.url;
       else {
         alert(json.error || "Checkout failed");

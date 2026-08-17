@@ -25,6 +25,11 @@ function mountStatic(app) {
   }
 
   app.use("/client", express.static(path.join(publicDir, "client")));
+  app.use("/account", express.static(path.join(publicDir, "account")));
+  app.use(
+    "/server-admin",
+    express.static(path.join(publicDir, "server-admin"))
+  );
   app.use("/website", express.static(path.join(publicDir, "website")));
   app.use(express.static(websiteDir));
 

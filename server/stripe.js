@@ -9,7 +9,7 @@ function randomSuffix(n = 8) {
   return out;
 }
 
-async function createCheckoutSession(stripe, plan, baseUrl) {
+async function createCheckoutSession(stripe, plan, baseUrl, user) {
   const successUrl = `${baseUrl}/shop-success.html?session_id={CHECKOUT_SESSION_ID}&provider=stripe`;
   const cancelUrl = `${baseUrl}/shop-cancel.html`;
 
@@ -30,7 +30,12 @@ async function createCheckoutSession(stripe, plan, baseUrl) {
     line_items: [{ price_data: priceData, quantity: 1 }],
     success_url: successUrl,
     cancel_url: cancelUrl,
-    metadata: { plan_id: plan.id, product: "vmule-server" },
+    customer_email: user?.email || undefined,
+    metadata: {
+      plan_id: plan.id,
+      product: "vmule-server",
+      account_id: user?.id || "",
+    },
     integration_identifier: `vmule_shop_${randomSuffix()}`,
   });
 }

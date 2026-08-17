@@ -1,6 +1,6 @@
 # vMule
 
-Windows P2P client in the eMule tradition, plus a project website, Stripe server checkout, and a separate Python release admin.
+Windows P2P client in the eMule tradition, plus a project website, account system, server console, payment checkout, and a separate Python release admin.
 
 Share only files you have the right to distribute. The demo catalog is public-domain, open-source, and Creative Commons material.
 
@@ -29,8 +29,25 @@ start-admin.bat
 | --- | --- |
 | Website | http://localhost:4242/ |
 | Client | http://localhost:4242/client/ |
+| Account | http://localhost:4242/account/ |
+| Server console | http://localhost:4242/server-admin/ |
 | Shop | http://localhost:4242/shop.html |
 | Update admin | http://127.0.0.1:5050/ |
+
+## Accounts and server console
+
+Accounts use signed, HTTP-only cookies and scrypt password hashes. The first
+registered account becomes administrator when no administrator exists. You can
+also configure a durable environment administrator with `ADMIN_USER` and
+`ADMIN_PASSWORD`.
+
+Local development stores accounts in the ignored `data/accounts.json` file.
+For Vercel or multi-instance deployments, set `DATABASE_URL` to PostgreSQL;
+the `vmule_users` table is created automatically. Also set a long random
+`AUTH_SECRET`. Registration can be disabled with `ALLOW_REGISTRATION=0`.
+
+The administrator console at `/server-admin/` manages VMLF/Kad connections,
+transfers, servers, runtime settings, logs, and user roles.
 
 ## Build the NSIS installer
 
@@ -59,6 +76,8 @@ electron/        Desktop shell
 server/          Node API (VmuleEngine, VMLF TCP, REST + SSE)
 public/website/  Project site
 public/client/   Client UI
+public/account/  Sign-in, registration, profile
+public/server-admin/  Authenticated server console
 admin/           Python update admin
 data/            Published updates
 ```

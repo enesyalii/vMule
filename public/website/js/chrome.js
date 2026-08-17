@@ -14,6 +14,7 @@
     ["team.html", "Team"],
     ["contact.html", "Contact"],
     ["shop.html", "Shop"],
+    ["/account/", "Account"],
   ];
 
   function hnav() {
@@ -45,6 +46,7 @@
       <ul class="navlist">
         ${links.map(([href, label]) => `<li><a href="${href}">${label}</a></li>`).join("")}
         <li><a href="/client/">Open vMule client</a></li>
+        <li><a href="/server-admin/">Server console</a></li>
       </ul>
       <div class="box-h">News Help</div>
       <div class="box-b muted">Read the FAQ before posting. The forum is staffed by volunteers, not paid support.</div>
@@ -62,7 +64,7 @@
   </div>
   <div class="footer">
     <div>vMule is free software inspired by the classic eMule client. Share files you are allowed to share.</div>
-    <div><a href="contact.html">Contact</a> · <a href="shop.html">Servers</a></div>
+    <div><a href="contact.html">Contact</a> · <a href="/account/">Account</a> · <a href="/server-admin/">Server console</a></div>
   </div>
 </div>`;
   };

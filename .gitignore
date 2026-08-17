@@ -6,6 +6,7 @@ __pycache__/
 venv/
 data/purchases.json
 data/state.json
+data/accounts.json
 *.log
 .DS_Store
 dist/

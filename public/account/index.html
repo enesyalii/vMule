@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>vMule Account</title>
+  <link rel="icon" href="/website/img/logo.svg">
+  <link rel="stylesheet" href="account.css">
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <a href="/" class="brand">
+        <img src="/website/img/logo.svg" alt="">
+        <span>vMule <b>Account</b></span>
+      </a>
+      <a href="/client/" class="back">Open client</a>
+    </header>
+
+    <section id="loading" class="card">Loading account…</section>
+
+    <section id="signed-out" class="auth-grid" hidden>
+      <form id="login-form" class="card">
+        <p class="eyebrow">Welcome back</p>
+        <h1>Sign in</h1>
+        <label>Username or email
+          <input name="login" autocomplete="username" required>
+        </label>
+        <label>Password
+          <input name="password" type="password" autocomplete="current-password" required>
+        </label>
+        <button type="submit">Sign in</button>
+        <p class="message" id="login-message" aria-live="polite"></p>
+      </form>
+
+      <form id="register-form" class="card">
+        <p class="eyebrow">New to vMule?</p>
+        <h1 id="register-title">Create account</h1>
+        <p id="setup-note" class="setup-note" hidden>
+          No administrator exists. This first account will become the server administrator.
+        </p>
+        <label>Username
+          <input name="username" minlength="3" maxlength="32" pattern="[A-Za-z0-9][A-Za-z0-9_.-]{2,31}" autocomplete="username" required>
+        </label>
+        <label>Email <span>(optional)</span>
+          <input name="email" type="email" autocomplete="email">
+        </label>
+        <label>Password
+          <input name="password" type="password" minlength="10" autocomplete="new-password" required>
+        </label>
+        <button type="submit">Create account</button>
+        <p class="message" id="register-message" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <section id="signed-in" class="account-grid" hidden>
+      <div class="card profile-card">
+        <p class="eyebrow">Signed in</p>
+        <h1 id="account-name"></h1>
+        <div class="role" id="account-role"></div>
+        <dl>
+          <dt>Account ID</dt><dd id="account-id"></dd>
+          <dt>Storage</dt><dd id="account-storage"></dd>
+          <dt>Status</dt><dd>Active</dd>
+        </dl>
+        <div class="actions">
+          <a href="/client/" class="button">Open client</a>
+          <a href="/server-admin/" id="admin-link" class="button secondary" hidden>Server panel</a>
+          <button type="button" id="logout" class="ghost">Sign out</button>
+        </div>
+      </div>
+
+      <form id="profile-form" class="card">
+        <p class="eyebrow">Profile</p>
+        <h2>Contact details</h2>
+        <label>Email
+          <input name="email" type="email" autocomplete="email">
+        </label>
+        <button type="submit">Save profile</button>
+        <p class="message" id="profile-message" aria-live="polite"></p>
+      </form>
+
+      <form id="password-form" class="card">
+        <p class="eyebrow">Security</p>
+        <h2>Change password</h2>
+        <label>Current password
+          <input name="currentPassword" type="password" autocomplete="current-password" required>
+        </label>
+        <label>New password
+          <input name="newPassword" type="password" minlength="10" autocomplete="new-password" required>
+        </label>
+        <button type="submit">Update password</button>
+        <p class="message" id="password-message" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <p id="persistence-warning" class="warning" hidden>
+      Account storage is not persistent on this serverless deployment. Configure
+      <code>DATABASE_URL</code> or an environment administrator before using this in production.
+    </p>
+  </main>
+  <script src="account.js"></script>
+</body>
+</html>

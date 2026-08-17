@@ -5,9 +5,16 @@ const config = require("./config");
 const { VmuleEngine } = require("./engine/VmuleEngine");
 const { PLANS } = require("./plans");
 const { createClientRoutes, createShopRoutes } = require("./routes/api");
+const { createAuthRoutes } = require("./routes/auth");
+const { createAdminRoutes } = require("./routes/admin");
 const { mountStatic } = require("./routes/static");
 const { errorHandler } = require("./middleware/errors");
 const { tickServerless } = require("./middleware/serverless");
+const { AccountManager } = require("./auth/manager");
+const {
+  createAuthMiddleware,
+  requireUser,
+} = require("./auth/session");
 const { createVmlfTcpServer } = require("./protocol/vmlf-tcp");
 const {
   createPolarClient,
@@ -18,6 +25,7 @@ const {
 
 function createApp() {
   const engine = new VmuleEngine();
+  const accounts = new AccountManager();
   const stripe = config.STRIPE_SECRET_KEY
     ? new Stripe(config.STRIPE_SECRET_KEY, { apiVersion: "2026-07-29.dahlia" })
     : null;
@@ -52,6 +60,7 @@ function createApp() {
         customerEmail: session.customer_details?.email,
         mode: session.mode,
         provider: "stripe",
+        accountId: session.metadata?.account_id || null,
         paidAt: new Date().toISOString(),
       });
     }
@@ -74,6 +83,10 @@ function createApp() {
           customerEmail: order.customer?.email,
           mode: order.subscription_id ? "subscription" : "payment",
           provider: "polar",
+          accountId:
+            order.metadata?.account_id ||
+            order.checkout?.metadata?.account_id ||
+            null,
           paidAt: new Date().toISOString(),
         });
       }
@@ -99,13 +112,16 @@ function createApp() {
   app.use(express.urlencoded({ extended: true }));
 
   app.use("/api", apiTick);
-  app.use("/api", createShopRoutes(engine, stripe, polar));
-  app.use("/api", createClientRoutes(engine, stripe, polar));
+  app.use("/api", createAuthMiddleware(accounts));
+  app.use("/api", createAuthRoutes(accounts));
+  app.use("/api", createAdminRoutes(engine, accounts));
+  app.use("/api", createShopRoutes(engine, stripe, polar, requireUser));
+  app.use("/api", createClientRoutes(engine, stripe, polar, requireUser));
 
   mountStatic(app);
   app.use(errorHandler);
 
-  return { app, engine, stripe, polar };
+  return { app, engine, stripe, polar, accounts };
 }
 
 function startServer() {

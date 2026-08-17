@@ -39,7 +39,7 @@ npm install
 npm run build:win
 ```
 
-Output: `dist/vMule-Setup-0.50.0.exe`
+Output: `dist/vMule-Setup-0.51.0.exe`
 
 ## Stripe
 

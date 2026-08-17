@@ -1,13 +1,30 @@
-const { Polar } = require("@polar-sh/sdk");
-const { validateEvent, WebhookVerificationError } = require("@polar-sh/sdk/webhooks.js");
 const config = require("./config");
+
+let PolarClass = null;
+let validateEventFn = null;
+let WebhookVerificationErrorClass = null;
+
+function loadPolarSdk() {
+  if (PolarClass) return;
+  const { Polar } = require("@polar-sh/sdk");
+  const webhooks = require("@polar-sh/sdk/webhooks.js");
+  PolarClass = Polar;
+  validateEventFn = webhooks.validateEvent;
+  WebhookVerificationErrorClass = webhooks.WebhookVerificationError;
+}
 
 function createPolarClient() {
   if (!config.POLAR_ACCESS_TOKEN) return null;
-  return new Polar({
-    accessToken: config.POLAR_ACCESS_TOKEN,
-    server: config.POLAR_SANDBOX ? "sandbox" : "production",
-  });
+  try {
+    loadPolarSdk();
+    return new PolarClass({
+      accessToken: config.POLAR_ACCESS_TOKEN,
+      server: config.POLAR_SANDBOX ? "sandbox" : "production",
+    });
+  } catch (err) {
+    console.warn(`Polar SDK unavailable: ${err.message}`);
+    return null;
+  }
 }
 
 function polarProductId(plan) {
@@ -48,11 +65,12 @@ function verifyPolarWebhook(body, headers) {
   if (!config.POLAR_WEBHOOK_SECRET) {
     throw new Error("POLAR_WEBHOOK_SECRET is not configured");
   }
-  return validateEvent(body, headers, config.POLAR_WEBHOOK_SECRET);
+  loadPolarSdk();
+  return validateEventFn(body, headers, config.POLAR_WEBHOOK_SECRET);
 }
 
 function polarWebhookError(err) {
-  return err instanceof WebhookVerificationError;
+  return WebhookVerificationErrorClass && err instanceof WebhookVerificationErrorClass;
 }
 
 module.exports = {

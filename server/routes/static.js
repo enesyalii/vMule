@@ -25,6 +25,10 @@ function mountStatic(app) {
   }
 
   app.use("/client", express.static(path.join(publicDir, "client")));
+  app.use("/apk-studio", express.static(path.join(publicDir, "apk-studio")));
+  app.get("/apk-studio", (_req, res) => {
+    res.sendFile(path.join(publicDir, "apk-studio", "index.html"));
+  });
   app.use("/website", express.static(path.join(publicDir, "website")));
   app.use(express.static(websiteDir));
 

@@ -9,6 +9,7 @@ data/state.json
 *.log
 .DS_Store
 dist/
+.apk-studio-sessions/
 .vercel
 release/
 *.exe

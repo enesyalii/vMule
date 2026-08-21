@@ -1,0 +1,22 @@
+{
+  "appId": "net.vmule.apkstudio",
+  "productName": "APK Studio",
+  "copyright": "vMule",
+  "directories": {
+    "output": "dist",
+    "buildResources": "build"
+  },
+  "files": [
+    "electron/apk-studio.js",
+    "server/**/*",
+    "public/apk-studio/**/*",
+    "package.json"
+  ],
+  "win": {
+    "icon": "build/icon.png",
+    "target": ["portable"]
+  },
+  "portable": {
+    "artifactName": "APK-Studio-${version}.exe"
+  }
+}

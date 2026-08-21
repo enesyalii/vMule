@@ -6,6 +6,7 @@ const { VmuleEngine } = require("./engine/VmuleEngine");
 const { PLANS } = require("./plans");
 const { createClientRoutes, createShopRoutes } = require("./routes/api");
 const { mountStatic } = require("./routes/static");
+const { createApkStudioRoutes } = require("./apk-studio/routes");
 const { errorHandler } = require("./middleware/errors");
 const { tickServerless } = require("./middleware/serverless");
 const { createVmlfTcpServer } = require("./protocol/vmlf-tcp");
@@ -101,6 +102,7 @@ function createApp() {
   app.use("/api", apiTick);
   app.use("/api", createShopRoutes(engine, stripe, polar));
   app.use("/api", createClientRoutes(engine, stripe, polar));
+  app.use("/api/apk-studio", createApkStudioRoutes());
 
   mountStatic(app);
   app.use(errorHandler);
@@ -128,6 +130,7 @@ function startServer() {
     console.log(`vMule site     http://localhost:${config.PORT}/`);
     console.log(`vMule client   http://localhost:${config.PORT}/client/`);
     console.log(`Shop           http://localhost:${config.PORT}/shop.html`);
+    console.log(`APK Studio     http://localhost:${config.PORT}/apk-studio/`);
     console.log(`API events     http://localhost:${config.PORT}/api/events (SSE)`);
     console.log(`Stripe         ${boot.stripe ? "keys loaded" : "demo mode (no STRIPE_SECRET_KEY)"}`);
     console.log(`Polar          ${boot.polar ? "keys loaded" : "demo mode (no POLAR_ACCESS_TOKEN)"}`);

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>APK Studio</title>
+  <link rel="stylesheet" href="css/studio.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect fill='%232563eb' width='32' height='32' rx='6'/><text x='16' y='22' text-anchor='middle' fill='white' font-size='14' font-family='sans-serif'>A</text></svg>">
+</head>
+<body>
+  <div class="app">
+    <header class="toolbar">
+      <div class="brand">
+        <span class="logo">APK</span>
+        <span class="title">APK Studio</span>
+      </div>
+      <div class="actions">
+        <button type="button" id="btn-open" title="Open APK (Ctrl+O)">Open APK</button>
+        <button type="button" id="btn-new" title="New blank APK">New APK</button>
+        <button type="button" id="btn-save" disabled title="Export APK (Ctrl+S)">Export APK</button>
+        <button type="button" id="btn-extract" disabled title="Extract selected file">Extract</button>
+        <button type="button" id="btn-save-entry" disabled title="Save entry changes">Save Entry</button>
+      </div>
+      <input type="file" id="file-input" accept=".apk,application/vnd.android.package-archive" hidden>
+    </header>
+
+    <div class="info-bar" id="info-bar" hidden>
+      <span id="info-package"></span>
+      <span id="info-version"></span>
+      <span id="info-size"></span>
+      <span id="info-entries"></span>
+      <span id="info-dirty" class="dirty" hidden>modified</span>
+    </div>
+
+    <main class="workspace">
+      <aside class="tree-panel">
+        <div class="panel-head">
+          <span>Archive tree</span>
+          <input type="search" id="tree-filter" placeholder="Filter…" autocomplete="off">
+        </div>
+        <div class="tree-scroll" id="tree-root" tabindex="0">
+          <p class="placeholder">Open an APK to explore its contents.</p>
+        </div>
+      </aside>
+
+      <section class="viewer-panel">
+        <div class="panel-head">
+          <span id="viewer-path">No file selected</span>
+          <div class="view-tabs" id="view-tabs">
+            <button type="button" data-view="parsed" class="active">Parsed</button>
+            <button type="button" data-view="text">Text</button>
+            <button type="button" data-view="hex">Hex</button>
+            <button type="button" data-view="info">Info</button>
+          </div>
+        </div>
+        <div class="viewer-body">
+          <div id="view-parsed" class="view-pane active"><pre class="code"></pre></div>
+          <div id="view-text" class="view-pane"><textarea id="text-editor" spellcheck="false"></textarea></div>
+          <div id="view-hex" class="view-pane"><pre class="hex" id="hex-view"></pre></div>
+          <div id="view-info" class="view-pane"><dl class="meta" id="meta-view"></dl><img id="image-preview" alt="" hidden></div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="statusbar">
+      <span id="status-left">Ready</span>
+      <span id="status-right">NBTExplorer-style APK editor</span>
+    </footer>
+  </div>
+
+  <dialog id="new-dialog">
+    <form method="dialog" id="new-form">
+      <h2>New APK</h2>
+      <label>Package name<input name="package" value="com.example.app" required></label>
+      <label>App label<input name="label" value="My App"></label>
+      <label>Version name<input name="versionName" value="1.0"></label>
+      <label>Version code<input name="versionCode" value="1"></label>
+      <div class="dialog-actions">
+        <button type="button" value="cancel">Cancel</button>
+        <button type="submit" value="ok" class="primary">Create</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="js/studio.js" type="module"></script>
+</body>
+</html>

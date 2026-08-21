@@ -31,6 +31,40 @@ start-admin.bat
 | Client | http://localhost:4242/client/ |
 | Shop | http://localhost:4242/shop.html |
 | Update admin | http://127.0.0.1:5050/ |
+| APK Studio | http://localhost:4242/apk-studio/ |
+
+## APK Studio
+
+NBTExplorer-style editor for Android APK files. Browse the archive tree, view decoded `AndroidManifest.xml`, inspect DEX headers and images, edit text entries, and export a rebuilt APK.
+
+Web UI:
+
+```bat
+npm install
+npm start
+```
+
+Then open http://localhost:4242/apk-studio/
+
+Desktop shell (separate port):
+
+```bat
+npm run electron:apk
+```
+
+Or run the server only on port 4243:
+
+```bat
+start-apk-studio.bat
+```
+
+Build portable Windows app:
+
+```bat
+npm run build:apk-studio
+```
+
+Output: `dist/APK-Studio-0.51.0.exe`
 
 ## Build the NSIS installer
 
